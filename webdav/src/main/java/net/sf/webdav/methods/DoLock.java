@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -216,10 +217,10 @@ public class DoLock extends AbstractMethod {
         } catch (LockFailedException e) {
             sendLockFailError(transaction, req, resp);
         } catch (WebdavException e) {
-            resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
-            LOG.error("Webdav exception", e);
+            LOG.error(e.getMessage());
+            resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         } catch (Exception e) {
-            resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             LOG.error("Servlet exception", e);
         } finally {
             parentSo = null;
@@ -494,7 +495,7 @@ public class DoLock extends AbstractMethod {
         resp.setStatus(WebdavStatus.SC_OK);
         resp.setContentType("text/xml; charset=UTF-8");
 
-        XMLWriter generatedXML = new XMLWriter(resp.getWriter(), namespaces);
+        XMLWriter generatedXML = new XMLWriter(new OutputStreamWriter(resp.getOutputStream()), namespaces);
         generatedXML.writeXMLHeader();
         generatedXML.writeElement("DAV::prop", XMLWriter.OPENING);
         generatedXML.writeElement("DAV::lockdiscovery", XMLWriter.OPENING);

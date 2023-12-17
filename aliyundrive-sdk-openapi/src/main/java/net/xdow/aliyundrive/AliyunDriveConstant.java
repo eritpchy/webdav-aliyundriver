@@ -28,4 +28,5 @@ public class AliyunDriveConstant {
     public static final String API_FILE_COPY = API_HOST + "/adrive/v1.0/openFile/copy";
     public static final String API_FILE_MOVE_TO_TRASH = API_HOST + "/adrive/v1.0/openFile/recyclebin/trash";
     public static final String API_FILE_DELETE = API_HOST + "/adrive/v1.0/openFile/delete";
+    public static final String API_VIDEO_PREVIEW_PLAY_INFO = API_HOST + "/adrive/v1.0/openFile/getVideoPreviewPlayInfo";
 }

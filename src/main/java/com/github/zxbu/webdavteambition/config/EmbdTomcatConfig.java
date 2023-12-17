@@ -3,9 +3,12 @@ package com.github.zxbu.webdavteambition.config;
 import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.authenticator.BasicAuthenticator;
+import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,7 @@ import java.util.Collections;
 
 @Component
 @ConditionalOnProperty(prefix = "aliyundrive.auth", name = "enable", matchIfMissing = true)
-public class AuthTomcatConfig implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>, Ordered {
+public class EmbdTomcatConfig implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>, Ordered {
 
     @Autowired
     private AliyunDriveProperties mAliyunDriveProperties;
@@ -58,9 +61,24 @@ public class AuthTomcatConfig implements WebServerFactoryCustomizer<Configurable
             securityConstraint.addAuthRole("**");
             SecurityCollection collection = new SecurityCollection();
             collection.addPattern("/*");
+            collection.addOmittedMethod("OPTIONS");
             securityConstraint.addCollection(collection);
             context.addConstraint(securityConstraint);
             context.getPipeline().addValve(digestAuthenticator);
+
+            FilterDef corsFilterDef = new FilterDef();
+            corsFilterDef.setFilterClass(CorsFilter.class.getName());
+            corsFilterDef.setFilterName(CorsFilter.class.getSimpleName());
+            corsFilterDef.addInitParameter("cors.allowed.origins", "*");
+            corsFilterDef.addInitParameter("cors.allowed.methods", "OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,PROPFIND,PUT,MKCOL");
+            corsFilterDef.addInitParameter("cors.allowed.headers", "origin,content-type,accept,authorization,access-control-allow-origin,depth,destination,If-None-Match");
+            corsFilterDef.addInitParameter("cors.exposed.headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials");
+            context.addFilterDef(corsFilterDef);
+
+            FilterMap corsFilterMap = new FilterMap();
+            corsFilterMap.setFilterName(CorsFilter.class.getSimpleName());
+            corsFilterMap.addURLPattern("/*");
+            context.addFilterMap(corsFilterMap);
         });
 
     }

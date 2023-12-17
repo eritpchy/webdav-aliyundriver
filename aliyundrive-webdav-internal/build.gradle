@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'net.xdow'
-version '1.3.2'
+version '2.0.0'
 description 'AliyunDrive Webdav internal'
 
 java {
@@ -28,19 +28,28 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
-    implementation 'org.web3j:crypto:5.0.0'
+    implementation ('org.web3j:crypto:5.0.0') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
+    }
 //    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 //    compileOnly 'jakarta.servlet:jakarta.servlet-api:5.0.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation project(':aliyundrive-sdk-openapi')
     implementation project(':aliyundrive-sdk-webapi')
     implementation project(':webdav')
     implementation 'commons-io:commons-io:2.6'// 2.11.0=java8 2.6=java7
     implementation 'org.apache.commons:commons-lang3:3.8'
+    implementation 'commons-codec:commons-codec:1.15'  //java7
     implementation 'com.google.guava:guava:20.0' //java7
     compileOnly 'com.squareup.okhttp3:okhttp:3.12.13' //api19
     compileOnly 'com.squareup.okhttp3:logging-interceptor:3.12.13' //api19
     implementation 'dnsjava:dnsjava:2.1.9' //java7
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+    implementation 'org.apache.commons:commons-compress:1.20' //java7
+    // https://mvnrepository.com/artifact/org.tukaani/xz
+    implementation 'org.tukaani:xz:1.9'
 }
 
 test {
@@ -48,3 +57,4 @@ test {
 }
 
 apply from: rootProject.file('gradle/maven-center-publish-java.gradle')
+apply from: rootProject.file('gradle/frontend.gradle')

@@ -1,0 +1,10 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": ".*/frontend.version.json$"},
+      {"pattern": ".*/frontend.tar.xz$"}
+    ],
+    "excludes": [
+    ]
+  }
+}

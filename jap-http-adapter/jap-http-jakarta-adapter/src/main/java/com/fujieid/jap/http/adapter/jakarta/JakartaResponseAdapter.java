@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author yadong.zhang (yadong.zhang0415(a)gmail.com)
@@ -140,7 +141,11 @@ public class JakartaResponseAdapter implements JapHttpResponse {
     @Override
     public void write(String html) {
         try {
-            this.response.getWriter().write(html);
+            try {
+                this.response.getOutputStream().write(html.getBytes(StandardCharsets.UTF_8));
+            } catch (IllegalStateException e) {
+                this.response.getWriter().write(html);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

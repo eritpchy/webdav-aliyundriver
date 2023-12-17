@@ -27,11 +27,13 @@ public class AliyunDriveProperties {
     private String deviceId;
     private String appId = "5dde4e1bdf9e4966b387ba58f4b3fdc3";
     private Session session = new Session();
+    private String shareToken;
+    private long shareExpireSec = 60 * 60 * 24;
 
     private transient String clientId;
 
     private transient String authorizationCode;
-    private transient String aliyunAccessTokenUrl = "https://adrive.xdow.net/oauth/access_token?code=%s&refresh_token=%s&ver=1.3.2";
+    private transient String aliyunAccessTokenUrl = "https://adrive.xdow.net/oauth/access_token?code=%s&refresh_token=%s&ver=2.0.0";
     private transient String aliyunAuthorizeUrl = "https://adrive.xdow.net/oauth/authorize?redirect_uri=%s";
 
     private transient Auth auth = new Auth();
@@ -87,6 +89,10 @@ public class AliyunDriveProperties {
 
     public String getMetaFileName() {
         return META_FILE_NAME;
+    }
+
+    public File getFrontendDir() {
+        return new File(getWorkDir(), "web");
     }
 
     @Data

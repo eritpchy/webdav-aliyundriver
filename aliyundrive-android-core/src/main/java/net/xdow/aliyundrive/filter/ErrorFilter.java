@@ -31,6 +31,7 @@ public class ErrorFilter implements Filter, IErrorFilterCall {
         JavaxRequestAdapter req = new JavaxRequestAdapter(httpServletRequest);
         JavaxResponseAdapter res = new JavaxResponseAdapter(httpServletResponse);
         ErrorWrapperResponseJavaxImpl wrapperResponse = new ErrorWrapperResponseJavaxImpl(httpServletResponse);
+        filterChain.doFilter(httpServletRequest, wrapperResponse);
         this.mErrorFilter.doFilterCall(req, res, wrapperResponse);
     }
 

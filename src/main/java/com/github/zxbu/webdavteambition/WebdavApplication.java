@@ -1,9 +1,10 @@
 package com.github.zxbu.webdavteambition;
 
+import com.github.zxbu.webdavteambition.bean.*;
 import com.github.zxbu.webdavteambition.config.AliyunDriveProperties;
 import com.github.zxbu.webdavteambition.filter.AliyunDriveLoginFilter;
 import com.github.zxbu.webdavteambition.filter.ErrorFilter;
-import com.github.zxbu.webdavteambition.model.PathInfo;
+import com.github.zxbu.webdavteambition.servlet.StartupServlet;
 import com.github.zxbu.webdavteambition.store.AliyunDriveFileSystemStore;
 import com.github.zxbu.webdavteambition.util.AliyunDriveClientServiceHolder;
 import net.sf.webdav.StoredObject;
@@ -14,6 +15,7 @@ import net.xdow.aliyundrive.webapi.bean.AliyunDriveWebResponse;
 import net.xdow.aliyundrive.webapi.bean.AliyunDriveWebShareRequestInfo;
 import net.xdow.aliyundrive.webapi.impl.AliyunDriveWebApiImplV1;
 import net.xdow.webdav.WebdavServlet;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +25,7 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -91,6 +94,18 @@ import java.util.Map;
         AliyunDriveWebApiImplV1.class,
         AliyunDriveFileSystemStore.class,
         StoredObject.class,
+        CorsFilter.class,
+        FrontendVersionInfo.class,
+        AFileReqInfo.class,
+        AliyunDriveBackupRootFileInfo.class,
+        AliyunDriveLiveTranscodingSubtitleTaskInfo.class,
+        AliyunDriveLiveTranscodingTaskInfo.class,
+        AliyunDriveResourceRootFileInfo.class,
+        AliyunDriveVideoPreviewPlayInfo.class,
+        AliyunDriveVirtualRootFileInfo.class,
+        FrontendVersionInfo.class,
+        GithubAssetsInfo.class,
+        GithubLatestInfo.class,
 })
 public class WebdavApplication {
     public static void main(String[] args) {
@@ -103,7 +118,7 @@ public class WebdavApplication {
     @Bean
     public ServletRegistrationBean<WebdavServlet> myServlet(){
         WebdavServlet webdavServlet = new WebdavServlet(this.mAliyunDriveClientServiceHolder.getAliyunDriveClientService());
-        ServletRegistrationBean<WebdavServlet> servletRegistrationBean = new ServletRegistrationBean<>(webdavServlet, "/*");
+        ServletRegistrationBean<WebdavServlet> servletRegistrationBean = new ServletRegistrationBean<>(webdavServlet, "/dav/*");
         Map<String, String> inits = new LinkedHashMap<>();
         inits.put("ResourceHandlerImplementation", AliyunDriveFileSystemStore.class.getName());
         // inits.put("ResourceHandlerImplementation", LocalFileSystemStore.class.getName());
@@ -114,8 +129,18 @@ public class WebdavApplication {
     }
 
     @Bean
+    public ServletRegistrationBean<StartupServlet> startupServlet(){
+        StartupServlet startupServlet = new StartupServlet(this.mAliyunDriveClientServiceHolder.getAliyunDriveClientService());
+        ServletRegistrationBean<StartupServlet> servletRegistrationBean = new ServletRegistrationBean<>(startupServlet, false);
+
+        servletRegistrationBean.setLoadOnStartup(1);
+        return servletRegistrationBean;
+    }
+
+    @Bean
     public FilterRegistrationBean disableSpringBootErrorFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setUrlPatterns(Collections.singleton("/dav/*"));
         filterRegistrationBean.setFilter(new ErrorFilter());
         filterRegistrationBean.setEnabled(true);
         return filterRegistrationBean;

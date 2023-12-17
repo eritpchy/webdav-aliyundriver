@@ -40,6 +40,7 @@ public interface IAliyunDrive {
     AliyunDriveCall<AliyunDriveResponse.FileCopyInfo> fileCopy(AliyunDriveRequest.FileCopyInfo query);
     AliyunDriveCall<AliyunDriveResponse.FileMoveToTrashInfo> fileMoveToTrash(AliyunDriveRequest.FileMoveToTrashInfo query);
     AliyunDriveCall<AliyunDriveResponse.FileDeleteInfo> fileDelete(AliyunDriveRequest.FileDeleteInfo query);
+    AliyunDriveCall<AliyunDriveResponse.VideoPreviewPlayInfo> videoPreviewPlayInfo(AliyunDriveRequest.VideoPreviewPlayInfo query);
     Call upload(String url, byte[] bytes, final int offset, final int byteCount);
     Call download(String url, String range, String ifRange);
     Map<String, String> getCommonHeaders();

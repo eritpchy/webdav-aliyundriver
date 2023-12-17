@@ -73,7 +73,9 @@ public class ResourceLocks implements IResourceLocks {
 
     public ResourceLocks() {
         _root = new LockedObject(this, "/", true);
+        _root._type = "write";
         _tempRoot = new LockedObject(this, "/", false);
+        _tempRoot._type = "write";
     }
 
     public synchronized boolean lock(ITransaction transaction, String path,
@@ -84,7 +86,7 @@ public class ResourceLocks implements IResourceLocks {
 
         if (temporary) {
             lo = generateTempLockedObjects(transaction, path);
-            lo._type = "read";
+            lo._type = "write";
         } else {
             lo = generateLockedObjects(transaction, path);
             lo._type = "write";

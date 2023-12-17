@@ -1,5 +1,7 @@
 <resources>
     <string name="config_refresh_token">refresh.token</string>
     <string name="config_device_id">refresh.device.id</string>
+    <string name="config_share_token">config.share.token</string>
     <string name="config_use_aliyun_drive_openapi">use.aliyun.drive.openapi</string>
+    <string name="config_download_proxy_mode">config.download.proxy.mode</string>
 </resources>

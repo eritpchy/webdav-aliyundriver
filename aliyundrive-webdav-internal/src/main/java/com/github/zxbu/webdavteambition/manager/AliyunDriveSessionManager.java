@@ -1,6 +1,7 @@
 package com.github.zxbu.webdavteambition.manager;
 
 import com.github.zxbu.webdavteambition.config.AliyunDriveProperties;
+import com.github.zxbu.webdavteambition.inf.IBackgroundTask;
 import net.xdow.aliyundrive.webapi.impl.AliyunDriveWebApiImplV1;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AliyunDriveSessionManager {
+public class AliyunDriveSessionManager implements IBackgroundTask {
 
     public static final int SIGN_EXPIRED_TIME_SEC = 60 * 5; //5min
 

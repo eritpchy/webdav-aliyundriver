@@ -1,6 +1,8 @@
 package net.xdow.aliyundrive.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import com.github.zxbu.webdavteambition.config.AliyunDriveProperties;
 import com.github.zxbu.webdavteambition.store.AliyunDriveClientService;
 import net.xdow.aliyundrive.R;
@@ -21,14 +23,20 @@ public class AliyunDriveClientServiceHolder {
                 if (sAliyunDriveClientService == null) {
                     ContextHandler.Context webContext = WebAppContext.getCurrentContext();
                     Context context = (Context) webContext.getAttribute("org.mortbay.ijetty.context");
-                    String refreshToken = String.valueOf(webContext.getAttribute(context.getString(R.string.config_refresh_token)));
-                    AliyunDriveProperties properties = AliyunDriveProperties.load(context.getFilesDir().getAbsolutePath() + File.separator);
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    String refreshToken = sharedPreferences.getString(context.getString(R.string.config_refresh_token),"");
+                    String deviceId = sharedPreferences.getString(context.getString(R.string.config_device_id),"");
+                    String shareToken = sharedPreferences.getString(context.getString(R.string.config_share_token),"");
+                    String downloadProxyMode = sharedPreferences.getString(context.getString(R.string.config_download_proxy_mode),"Auto");
+                    final AliyunDriveProperties properties = AliyunDriveProperties.load(context.getFilesDir().getAbsolutePath() + File.separator);
                     properties.setAuthorization(null);
                     if (!refreshToken.equals(properties.getRefreshTokenNext())) {
                         properties.setRefreshToken(refreshToken);
                     }
                     properties.setRefreshTokenNext(refreshToken);
-                    properties.setDeviceId(String.valueOf(webContext.getAttribute(context.getString(R.string.config_device_id))));
+                    properties.setDeviceId(deviceId);
+                    properties.setShareToken(shareToken);
+                    properties.setDownloadProxyMode(AliyunDriveProperties.DownloadProxyMode.valueOf(downloadProxyMode));
                     properties.setWorkDir(context.getFilesDir().getAbsolutePath() + File.separator);
                     properties.save();
                     boolean useAliyunDriveOpenApi = Boolean.parseBoolean(String.valueOf(webContext.getAttribute(context.getString(R.string.config_use_aliyun_drive_openapi))));
@@ -38,6 +46,12 @@ public class AliyunDriveClientServiceHolder {
                         sAliyunDriveClientService = new AliyunDriveClientService(AliyunDriveWebApiImplV1.class, properties);
                     }
                     sAliyunDriveClientService.setAccessTokenInvalidListener(() -> EventBus.getDefault().post(new AliyunDriveAccessTokenInvalidEvent()));
+                    sAliyunDriveClientService.setOnAccountChangedListener(() -> {
+                        String newRefreshToken = properties.getRefreshToken();
+                        sharedPreferences.edit()
+                                .putString(context.getString(R.string.config_refresh_token), newRefreshToken)
+                                .apply();
+                    });
                 }
             }
         }

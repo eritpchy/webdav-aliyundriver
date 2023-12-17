@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
  * @version 1.0.0
  * @since 1.0.5
  */
-public interface JapHttpRequest {
+public interface JapHttpRequest extends JapServletRequest {
 
     /**
      * Get the actual source object
@@ -143,6 +144,8 @@ public interface JapHttpRequest {
 
     Object getAttribute(String name);
 
+    Object getServletContextAttribute(String name);
+
     String getRequestURI();
 
     Locale getLocale();
@@ -158,4 +161,56 @@ public interface JapHttpRequest {
     Enumeration<String> getAttributeNames();
 
     Enumeration<String> getParameterNames();
+
+
+    /**
+     * Gets all the {@link JapPart} components of this request, provided
+     * that it is of type <tt>multipart/form-data</tt>.
+     *
+     * <p>If this request is of type <tt>multipart/form-data</tt>, but
+     * does not contain any Part components, the returned
+     * <tt>Collection</tt> will be empty.
+     *
+     * <p>Any changes to the returned <code>Collection</code> must not
+     * affect this <code>HttpServletRequest</code>.
+     *
+     * @return a (possibly empty) <code>Collection</code> of the
+     * Part components of this request
+     *
+     * @throws IOException if an I/O error occurred during the retrieval
+     * of the {@link JapPart} components of this request
+     *
+     * @throws IllegalStateException if the request body is larger than
+     * <tt>maxRequestSize</tt>, or any Part in the request is larger than
+     * <tt>maxFileSize</tt>
+     *
+     * @see javax.servlet.annotation.MultipartConfig#maxFileSize
+     * @see javax.servlet.annotation.MultipartConfig#maxRequestSize
+     *
+     * @since Servlet 3.0
+     */
+    public Collection<JapPart> getParts() throws IOException;
+
+
+    /**
+     * Gets the {@link JapPart} with the given name.
+     *
+     * @param name the name of the requested Part
+     *
+     * @return The Part with the given name, or <tt>null</tt> if this
+     * request is of type <tt>multipart/form-data</tt>, but does not
+     * contain the requested Part
+     *
+     * @throws IOException if an I/O error occurred during the retrieval
+     * of the requested Part
+     * @throws IllegalStateException if the request body is larger than
+     * <tt>maxRequestSize</tt>, or any Part in the request is larger than
+     * <tt>maxFileSize</tt>
+     *
+     * @see javax.servlet.annotation.MultipartConfig#maxFileSize
+     * @see javax.servlet.annotation.MultipartConfig#maxRequestSize
+     *
+     * @since Servlet 3.0
+     */
+    public JapPart getPart(String name) throws IOException;
 }

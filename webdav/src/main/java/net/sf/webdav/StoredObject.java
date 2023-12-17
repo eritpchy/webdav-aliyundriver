@@ -33,6 +33,8 @@ public class StoredObject {
 
     private String sha1sum;
 
+    private String thumbnailUrl;
+
     /**
      * Determines whether the StoredObject is a folder or a resource
      * 
@@ -170,5 +172,13 @@ public class StoredObject {
     }
     public void setSha1sum(String sha1sum) {
         this.sha1sum = sha1sum;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

@@ -58,6 +58,10 @@ public class DoPut extends AbstractMethod {
 
         if (!_readOnly) {
             String path = getRelativePath(req);
+            String name = req.getParameter("name");
+            if (name != null && name.length() > 0) {
+                path = path + "/" + name;
+            }
             String parentPath = getParentPath(path);
 
             _userAgent = req.getHeader("User-Agent");
@@ -174,7 +178,8 @@ public class DoPut extends AbstractMethod {
                 } catch (ChecksumNotMatchException e) {
                     resp.sendError(WebdavStatus.SC_BAD_REQUEST, "The computed checksum does not match the one received from the client.");
                 } catch (WebdavException e) {
-                    resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                    LOG.error(e.getMessage());
+                    resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 } finally {
                     //上传完主动释放这个文件的锁, finder这玩意有时候不会主动调用UNLOCK真是奇怪
                     String[] lockTokens = getLockIdFromIfHeader(req);

@@ -7,12 +7,13 @@ public class AliyunDriveWebConstant {
     public static String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36";
     public static final String REFERER = "https://www.aliyundrive.com/";
     public static final String API_HOST = "https://api.aliyundrive.com/v2";
+    public static final String API_HOST_USER = "https://user.aliyundrive.com/v2";
 
     public static final String API_TOKEN_REFRESH = "https://api.aliyundrive.com/token/refresh";
     public static final String API_ACCESS_TOKEN = API_TOKEN_REFRESH;
     public static final String API_USER_INFO = API_HOST + "/user/get";
     public static final String API_USER_GET_SPACE_INFO = "https://api.aliyundrive.com/adrive/v1/user/driveCapacityDetails";
-    public static final String API_USER_GET_DRIVE_INFO = API_HOST + "/user/get";
+    public static final String API_USER_GET_DRIVE_INFO = API_HOST_USER + "/user/get";
     public static final String API_USER_GET_VIP_INFO = API_HOST + "";
     public static final String API_FILE_LIST = API_HOST + "/file/list";
     public static final String API_FILE_GET = API_HOST + "/file/get";

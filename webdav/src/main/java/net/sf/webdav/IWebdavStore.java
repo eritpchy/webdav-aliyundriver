@@ -227,4 +227,8 @@ public interface IWebdavStore {
     String getFooter(ITransaction transaction);
 
     String getResourceDownloadUrlForRedirection(ITransaction transaction, String path);
+
+    String getPublicLink(ITransaction transaction, String path);
+
+    boolean handleCustomGetRequest(ITransaction transaction, String path);
 }

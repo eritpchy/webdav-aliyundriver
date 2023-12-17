@@ -39,5 +39,5 @@ out/
 *.log.*
 
 local.properties
-/conf/meta.json
+/conf/
 /ext/secring.gpg

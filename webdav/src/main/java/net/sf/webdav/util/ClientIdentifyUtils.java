@@ -40,6 +40,18 @@ public class ClientIdentifyUtils {
         return String.valueOf(userAgent).matches("Kodi/1*[0-9]\\..+");
     }
 
+    public static boolean isKodi(String userAgent) {
+        return String.valueOf(userAgent).matches("Kodi/.+");
+    }
+
+    public static boolean isAppleCoreMedia(String userAgent) {
+        return String.valueOf(userAgent).matches("AppleCoreMedia/.+");
+    }
+
+    public static boolean isVLC(String userAgent) {
+        return String.valueOf(userAgent).matches("VLC/.+");
+    }
+
     /**
      *
      * @param referer

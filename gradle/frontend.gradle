@@ -1,0 +1,51 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+abstract class DownloadTask extends DefaultTask {
+
+    @Input
+    String url
+
+    @TaskAction
+    void download() {
+        def headers = [ Accept: 'application/json' ]
+        def jsonText = new URL(this.url).getText(requestProperties: headers)
+        println(jsonText)
+        def parsedJson = new JsonSlurper().parseText( jsonText ) as Map
+        def remoteVersion = parsedJson.name
+        println("remoteVersion: ${remoteVersion}")
+        def destInfo = parsedJson.assets[0]
+        def distFile = new File(project.buildDir, "resources/main/com/github/zxbu/webdavteambition/frontend.tar.xz")
+        distFile.parentFile.mkdirs()
+
+        if (isUpToDated(distFile.parentFile, remoteVersion)) {
+            println("dist already downloaded, skip!")
+            return
+        }
+
+        ant.get(src: destInfo.browser_download_url, dest: distFile)
+        new File(distFile.parentFile, "frontend.version.json").write(JsonOutput.toJson([version: remoteVersion]))
+
+        if (distFile.length() != destInfo.size) {
+            throw new RuntimeException("file: ${destInfo.browser_download_url} download fail, length miss match, expect length: ${destInfo.size}, got: ${distFile.length()}")
+        }
+    }
+
+    boolean isUpToDated(File destDir, String remoteVersion) {
+        if (!destDir.exists()){
+            return false
+        }
+        File versionFile = new File(destDir, "frontend.version.json")
+        if (!versionFile.exists()){
+            return false
+        }
+
+        def parsedJson = new JsonSlurper().parseText( versionFile.text ) as Map
+        String localVersion = parsedJson.version
+        return localVersion.equalsIgnoreCase(remoteVersion)
+    }
+}
+
+tasks["processResources"].dependsOn (tasks.create(name: "downloadFrontend", type: DownloadTask) {
+    url = "https://xbimg.xdow.net/upload/aliyundrive-web/dist/latest"
+})

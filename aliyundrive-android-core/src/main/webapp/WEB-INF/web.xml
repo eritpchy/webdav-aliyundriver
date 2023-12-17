@@ -3,10 +3,46 @@
     version="3.0"
     xmlns="http://java.sun.com/xml/ns/javaee"
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <filter>
+        <filter-name>error</filter-name>
+        <filter-class>net.xdow.aliyundrive.filter.ErrorFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>error</filter-name>
+        <url-pattern>/dav/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>cross-origin</filter-name>
+        <filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
+        <init-param>
+            <param-name>allowedOrigins</param-name>
+            <param-value>*</param-value>
+        </init-param>
+        <init-param>
+            <param-name>allowedMethods</param-name>
+            <param-value>OPTIONS,GET,HEAD,POST,DELETE,TRACE,PROPPATCH,COPY,MOVE,LOCK,UNLOCK,PROPFIND,PUT,MKCOL</param-value>
+        </init-param>
+        <init-param>
+            <param-name>allowedHeaders</param-name>
+            <param-value>origin,content-type,accept,authorization,access-control-allow-origin,depth,destination,If-None-Match</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>cross-origin</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+        <filter-name>aliyundrive-login</filter-name>
+        <filter-class>net.xdow.aliyundrive.filter.AliyunDriveLoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>aliyundrive-login</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
-        <servlet-name>StartupService</servlet-name>
-        <servlet-class>net.xdow.aliyundrive.store.StartupService</servlet-class>
+        <servlet-name>StartupServlet</servlet-name>
+        <servlet-class>net.xdow.aliyundrive.servlet.StartupServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
@@ -29,12 +65,13 @@
 
     <servlet-mapping>
         <servlet-name>WebdavServlet</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/dav/*</url-pattern>
     </servlet-mapping>
 
     <security-constraint>
         <web-resource-collection>
             <url-pattern>/*</url-pattern>
+            <http-method-omission>OPTIONS</http-method-omission>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -45,5 +82,28 @@
         <auth-method>BASIC</auth-method>
         <realm-name>Console</realm-name>
     </login-config>
-
+    <servlet>
+        <servlet-name>DefaultServlet</servlet-name>
+        <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+        <init-param>
+            <param-name>resourceBase</param-name>
+            <param-value>/data/data/net.xdow.webdavaliyundriver/files/web</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dirAllowed</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>pathInfoOnly</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DefaultServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/index.html</location>
+    </error-page>
 </web-app>

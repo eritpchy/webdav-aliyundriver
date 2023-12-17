@@ -412,7 +412,7 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
                             res = new AliyunDriveResponse.FileMoveToTrashInfo();
                             res.setFileId(query.getFileId());
                             res.setDriveId(query.getDriveId());
-                            res.setAsync_task_id("");
+                            res.setAsyncTaskId("");
                         }
                         return res;
                     }
@@ -430,11 +430,19 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
                             res = new AliyunDriveResponse.FileDeleteInfo();
                             res.setFileId(query.getFileId());
                             res.setDriveId(query.getDriveId());
-                            res.setAsync_task_id("");
+                            res.setAsyncTaskId("");
                         }
                         return res;
                     }
                 });
+    }
+
+    @Override
+    public AliyunDriveCall<AliyunDriveResponse.VideoPreviewPlayInfo> videoPreviewPlayInfo(AliyunDriveRequest.VideoPreviewPlayInfo query) {
+        AliyunDriveResponse.VideoPreviewPlayInfo  info = new AliyunDriveResponse.VideoPreviewPlayInfo();
+        info.setCode("WebApiUnsupportedPreview");
+        info.setMessage("WebApi not support preview");
+        return new AliyunDriveCall(info);
     }
 
     @Override

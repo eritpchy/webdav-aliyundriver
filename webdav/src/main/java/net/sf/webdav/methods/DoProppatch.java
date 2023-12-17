@@ -21,6 +21,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.*;
 
 public class DoProppatch extends AbstractMethod {
@@ -153,7 +154,7 @@ public class DoProppatch extends AbstractMethod {
                 resp.setContentType("text/xml; charset=UTF-8");
 
                 // Create multistatus object
-                XMLWriter generatedXML = new XMLWriter(resp.getWriter(),
+                XMLWriter generatedXML = new XMLWriter(new OutputStreamWriter(resp.getOutputStream()),
                         namespaces);
                 generatedXML.writeXMLHeader();
                 generatedXML
@@ -206,9 +207,11 @@ public class DoProppatch extends AbstractMethod {
             } catch (AccessDeniedException e) {
                 resp.sendError(WebdavStatus.SC_FORBIDDEN);
             } catch (WebdavException e) {
-                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                LOG.error(e.getMessage());
+                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             } catch (JapException e) {
-                e.printStackTrace(); // To change body of catch statement use
+                LOG.warn("DoProppatch JapException", e);
+                // To change body of catch statement use
                 // File | Settings | File Templates.
             } finally {
                 _resourceLocks.unlockTemporaryLockedObjects(transaction, path,

@@ -168,6 +168,8 @@ public class AliyunDriveRequest {
         @NonNull
         private String driveId;
         @NonNull
+        private String toDriveId;
+        @NonNull
         private String fileId;
         @NonNull
         private String toParentFileId;
@@ -181,6 +183,8 @@ public class AliyunDriveRequest {
         private String driveId;
         @NonNull
         private String fileId;
+        @NonNull
+        private String toDriveId;
         @NonNull
         private String toParentFileId;
         private boolean autoRename;
@@ -200,6 +204,24 @@ public class AliyunDriveRequest {
         private String driveId;
         @NonNull
         private String fileId;
+    }
+
+    @Data
+    public static class VideoPreviewPlayInfo {
+        @NonNull
+        private String driveId;
+        @NonNull
+        private String fileId;
+        @NonNull
+        private String category = "live_transcoding";
+        private boolean getSubtitleInfo = true;
+        private String templateId;
+        /**
+         * 单位秒，最长4小时，默认15分钟。
+         */
+        private long urlExpireSec = 60 * 60 * 4;
+        private boolean onlyVip;
+        private boolean withPlayCursor;
     }
 
     @Data

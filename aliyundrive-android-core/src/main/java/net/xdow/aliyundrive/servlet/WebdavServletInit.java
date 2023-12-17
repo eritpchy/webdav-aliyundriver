@@ -30,4 +30,10 @@ public class WebdavServletInit extends WebdavServlet {
     public void init() {
         super.init();
     }
+
+    @Override
+    public void destroy() {
+        AliyunDriveClientServiceHolder.onShutdown();
+        super.destroy();
+    }
 }

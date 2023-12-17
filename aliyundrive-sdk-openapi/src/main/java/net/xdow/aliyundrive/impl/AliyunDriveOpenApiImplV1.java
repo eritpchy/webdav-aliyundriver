@@ -225,8 +225,8 @@ public class AliyunDriveOpenApiImplV1 implements IAliyunDrive, AliyunDriveAuthen
     @Override
     public AliyunDriveCall<AliyunDriveResponse.FileGetDownloadUrlInfo> fileGetDownloadUrl(AliyunDriveRequest.FileGetDownloadUrlInfo query) {
         int expireSec = query.getExpireSec();
-        if (expireSec < 900 || expireSec > 115200) {
-            throw new IllegalArgumentException("Error: expire_sec argument must between 900-115200s, got: " + expireSec);
+        if (expireSec > 115200) {
+            throw new IllegalArgumentException("Error: expire_sec argument must less then 115200s, got: " + expireSec);
         }
         return postApiRequest(AliyunDriveConstant.API_FILE_GET_DOWNLOAD_URL, query,
                 AliyunDriveResponse.FileGetDownloadUrlInfo.class, FLAG_API_AUTHENTICATION_CALL);
@@ -304,6 +304,12 @@ public class AliyunDriveOpenApiImplV1 implements IAliyunDrive, AliyunDriveAuthen
     public AliyunDriveCall<AliyunDriveResponse.FileDeleteInfo> fileDelete(AliyunDriveRequest.FileDeleteInfo query) {
         return postApiRequest(AliyunDriveConstant.API_FILE_DELETE, query,
                 AliyunDriveResponse.FileDeleteInfo.class, FLAG_API_AUTHENTICATION_CALL);
+    }
+
+    @Override
+    public AliyunDriveCall<AliyunDriveResponse.VideoPreviewPlayInfo> videoPreviewPlayInfo(AliyunDriveRequest.VideoPreviewPlayInfo query) {
+         return postApiRequest(AliyunDriveConstant.API_VIDEO_PREVIEW_PLAY_INFO, query,
+                 AliyunDriveResponse.VideoPreviewPlayInfo.class, FLAG_API_AUTHENTICATION_CALL);
     }
 
     @Override

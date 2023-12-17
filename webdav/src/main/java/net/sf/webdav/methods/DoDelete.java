@@ -80,7 +80,8 @@ public class DoDelete extends AbstractMethod {
                     resp.sendError(WebdavStatus.SC_NOT_FOUND, req
                             .getRequestURI());
                 } catch (WebdavException e) {
-                    resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                    LOG.error(e.getMessage());
+                    resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 } finally {
                     _resourceLocks.unlockTemporaryLockedObjects(transaction,
                             path, tempLockOwner);

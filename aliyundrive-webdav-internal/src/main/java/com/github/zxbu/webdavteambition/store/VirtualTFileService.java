@@ -1,5 +1,6 @@
 package com.github.zxbu.webdavteambition.store;
 
+import com.github.zxbu.webdavteambition.bean.AFileReqInfo;
 import net.sf.webdav.util.DateTimeUtils;
 import net.xdow.aliyundrive.bean.AliyunDriveEnum;
 import net.xdow.aliyundrive.bean.AliyunDriveFileInfo;
@@ -24,16 +25,16 @@ public class VirtualTFileService {
         return Holder.sVirtualTFileService;
     }
 
-    private final Map<String, Map<String, AliyunDriveFileInfo>> virtualTFileMap = new ConcurrentHashMap<>();
+    private final Map<AFileReqInfo, Map<String, AliyunDriveFileInfo>> virtualTFileMap = new ConcurrentHashMap<>();
 
     /**
      * 创建文件
      */
-    public void createVirtualFile(String parentId, AliyunDriveResponse.FileCreateInfo fileCreateInfo, long modifyTimeSec) {
-        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(parentId);
+    public void createVirtualFile(AFileReqInfo info, AliyunDriveResponse.FileCreateInfo fileCreateInfo, long modifyTimeSec) {
+        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(info);
         if (tFileMap == null) {
             tFileMap = new ConcurrentHashMap<>();
-            virtualTFileMap.put(parentId, tFileMap);
+            virtualTFileMap.put(info, tFileMap);
         }
         AliyunDriveFileInfo tFile = convert(fileCreateInfo);
         if (modifyTimeSec != -1) {
@@ -42,32 +43,32 @@ public class VirtualTFileService {
         tFileMap.put(fileCreateInfo.getFileId(), tFile);
     }
 
-    public AliyunDriveFileInfo get(String parentId, String fileId) {
-        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(parentId);
+    public AliyunDriveFileInfo get(AFileReqInfo info, String fileId) {
+        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(info);
         if (tFileMap == null) {
             return null;
         }
         return tFileMap.get(fileId);
     }
 
-    public void updateLength(String parentId, String fileId, long length) {
-        AliyunDriveFileInfo tFile = get(parentId, fileId);
+    public void updateLength(AFileReqInfo info, String fileId, long length) {
+        AliyunDriveFileInfo tFile = get(info, fileId);
         if (tFile == null) {
             return;
         }
         tFile.setSize(tFile.getSize() + length);
     }
 
-    public void remove(String parentId, String fileId) {
-        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(parentId);
+    public void remove(AFileReqInfo parentInfo, String fileId) {
+        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(parentInfo);
         if (tFileMap == null) {
             return;
         }
         tFileMap.remove(fileId);
     }
 
-    public Collection<AliyunDriveFileInfo> list(String parentId) {
-        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(parentId);
+    public Collection<AliyunDriveFileInfo> list(AFileReqInfo info) {
+        Map<String, AliyunDriveFileInfo> tFileMap = virtualTFileMap.get(info);
         if (tFileMap == null) {
             return Collections.emptyList();
         }

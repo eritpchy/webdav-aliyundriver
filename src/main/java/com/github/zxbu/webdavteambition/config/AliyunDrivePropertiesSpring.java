@@ -18,6 +18,7 @@ public class AliyunDrivePropertiesSpring extends AliyunDriveProperties implement
         other.setWorkDir(getWorkDir());
         other.setDriver(getDriver());
         other.setDownloadProxyMode(getDownloadProxyMode());
+        other.setShareExpireSec(getShareExpireSec());
         BeanUtils.copyProperties(other, this);
         this.setAuth(auth);
         this.setAuthorization(null);
@@ -34,6 +35,9 @@ public class AliyunDrivePropertiesSpring extends AliyunDriveProperties implement
         }
         if (StringUtils.isEmpty(this.getAuth().getPassword())) {
             this.getAuth().setPassword("admin");
+        }
+        if (StringUtils.isEmpty(this.getShareToken())) {
+            this.setShareToken(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
         }
         save();
     }

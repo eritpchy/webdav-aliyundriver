@@ -35,7 +35,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -551,9 +550,7 @@ public abstract class AbstractMethod implements IMethodExecutor {
 
             generatedXML.writeElement("DAV::multistatus", XMLWriter.CLOSING);
 
-            Writer writer = resp.getWriter();
-            writer.write(generatedXML.toString());
-            writer.close();
+            resp.write(generatedXML.toString());
         }
     }
 

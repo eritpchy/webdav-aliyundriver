@@ -57,6 +57,8 @@ public class AliyunDriveResponse {
         private String userName;
         private String nickName;
         private String defaultDriveId;
+        private String resourceDriveId;
+        private String backupDriveId;
         private long createdAt;
         private long updatedAt;
         private Map userData;
@@ -153,7 +155,7 @@ public class AliyunDriveResponse {
     public static class FileMoveInfo extends GenericMessageInfo {
         private String driveId;
         private String fileId;
-        private String async_task_id;
+        private String asyncTaskId;
         private boolean exist;
     }
 
@@ -161,21 +163,30 @@ public class AliyunDriveResponse {
     public static class FileCopyInfo extends GenericMessageInfo {
         private String driveId;
         private String fileId;
-        private String async_task_id;
+        private String asyncTaskId;
     }
 
     @Data
     public static class FileMoveToTrashInfo extends GenericMessageInfo {
         private String driveId;
         private String fileId;
-        private String async_task_id;
+        private String asyncTaskId;
     }
 
     @Data
     public static class FileDeleteInfo extends GenericMessageInfo {
         private String driveId;
         private String fileId;
-        private String async_task_id;
+        private String asyncTaskId;
+    }
+
+    @Data
+    public static class VideoPreviewPlayInfo extends GenericMessageInfo {
+        private String domainId;
+        private String driveId;
+        private String fileId;
+        private AliyunDriveVideoPreviewPlayInfo videoPreviewPlayInfo;
+        private String playCursor;
     }
 
     @Data

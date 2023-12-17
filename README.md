@@ -9,19 +9,19 @@
 
 > 3.4.0及以上版本默认支持直连模式下载
 
+> 4.0.0及以上版本支持web文件管理以及访问备份盘和资源库
+
 目录
 - [aliyundrive-webdav](#aliyundrive-webdav)
 - [如何使用](#如何使用)
     - [Jar包运行](#jar包运行)
     - [容器运行](#容器运行)
     - [Docker-Compose](#docker-compose)
+    - [Kubernetes](#Kubernetes)
+- [连接说明](#连接说明)
 - [参数说明](#参数说明)
 - [QQ群](#qq群)
 - [新手教程](#新手教程)
-    - [群晖](#群晖)
-    - [Windows10](#windows10)
-    - [Linux](#linux)
-    - [Mac](#mac)
 - [客户端兼容性](#客户端兼容性)
 - [浏览器获取refreshToken方式](#浏览器获取refreshtoken方式仅webapi需要)
 - [功能说明](#功能说明)
@@ -64,8 +64,9 @@ aliyundrive-webdav-windows-amd64.exe
 java -jar webdav.jar
 ```
 ## 容器运行
-```bash
-mkdir $(pwd)/conf
+<details>
+  <summary>点击展开</summary>
+  <pre>mkdir $(pwd)/conf
 docker run -d \
   --name=aliyundrive-webdav \
   --restart=always -p 8080:8080  \
@@ -76,15 +77,16 @@ docker run -d \
   -e ALIYUNDRIVE_DOWNLOAD_PROXY_MODE=Auto \
   -e ALIYUNDRIVE_REFRESH_TOKEN="your refreshToken" \
   -e ALIYUNDRIVE_AUTH_PASSWORD="admin" \
-  eritpchy/aliyundrive-webdav
+  eritpchy/aliyundrive-webdav</pre>
 
-# /conf 挂载卷自动维护了最新的refreshToken, 建议挂载
-# ALIYUNDRIVE_AUTH_PASSWORD 是admin账户的密码, 建议修改
-```
+- /conf 挂载卷自动维护了最新的refreshToken, 建议挂载
+- ALIYUNDRIVE_AUTH_PASSWORD 是admin账户的密码, 建议修改
+</details>
 
 ## Docker-Compose
-```yml
-version: "3.0"
+<details>
+  <summary>点击展开</summary>
+  <pre>version: "3.0"
 services:
   aliyundrive-webdav:
     image: eritpchy/aliyundrive-webdav
@@ -100,26 +102,39 @@ services:
       - ./docker/conf:/conf
     ports:
       - 6666:8080
-    restart: always
+    restart: always</pre>
 
-# “refreshToken”请根据下文说明自行获取。
-# “ALIYUNDRIVE_AUTH_USER-NAME”和“ALIYUNDRIVE_AUTH_PASSWORD”为连接用户名和密码, 建议更改。
-# “./docker/conf/:/conf”, 可以把冒号前改为指定目录, 比如“/homes/USER/docker/alidriver/:/conf”。
-# 删除了“/etc/localtime:/etc/localtime”, 如有需要同步时间请自行添加在environment下。
-# 端口6666可自行按需更改, 此端口为WebDAV连接端口,8080为容器内配置端口, 修改请量力而为。
-# 建议不要保留这些中文注释, 以防报错, 比如QNAP。
-```
+- "refreshToken"请根据下文说明自行获取。
+- "ALIYUNDRIVE_AUTH_USER-NAME"和"ALIYUNDRIVE_AUTH_PASSWORD"为连接用户名和密码, 建议更改。
+- "./docker/conf/:/conf", 可以把冒号前改为指定目录, 比如"/homes/USER/docker/alidriver/:/conf"。
+- 删除了"/etc/localtime:/etc/localtime", 如有需要同步时间请自行添加在environment下。
+- 端口6666可自行按需更改, 此端口为WebDAV连接端口,8080为容器内配置端口, 修改请量力而为。
+- 建议不要保留这些中文注释, 以防报错, 比如QNAP。
+</details>
+
 ## Kubernetes
-参考根目录内中的[k8s_app.yaml](k8s_app.yaml), 需要文件中修改container的环境变量值。  
-use this to deploy in truenas scale
-```shell
+<details>
+  <summary>点击展开</summary>
+  <pre># 参考根目录内中的[k8s_app.yaml](k8s_app.yaml), 需要文件中修改container的环境变量值。  
+# use this to deploy in truenas scale
 sudo k3s kubectl apply -f k8s_app.yaml
-```
-or other k8s cluster
-```shell
-sudo kubectl apply -f k8s_app.yaml
-```
-# 参数说明
+# or other k8s cluster
+sudo kubectl apply -f k8s_app.yaml</pre>
+</details>
+
+## 连接说明
+### 4.0.0及以上版本
+文件管理: http://{ip地址}:{端口号}/
+Webdav: http://{ip地址}:{端口号}/dav
+
+例如: http://127.0.0.1:8080/dav
+
+注意: Webdav路径为 /dav 必须填写
+
+### 4.0.0之前版本
+Webdav: http://{ip地址}:{端口号}
+
+## 参数说明
 ```bash
 --aliyundrive.refresh-token
     阿里云盘的refreshToken, 获取方式见下文
@@ -142,7 +157,7 @@ sudo kubectl apply -f k8s_app.yaml
     
 ```
 
-# SDK使用
+## SDK使用
 ```gradle
 //依赖
 compileOnly "org.projectlombok:lombok:1.18.26"
@@ -152,20 +167,20 @@ implementation "com.squareup.okhttp3:logging-interceptor:3.12.13" //api19
 implementation "com.google.code.gson:gson:2.8.9"
 
 //主要
-implementation "net.xdow:aliyundrive-sdk-openapi:1.3.2"
-implementation "net.xdow:aliyundrive-sdk-webapi:1.3.2"
+implementation "net.xdow:aliyundrive-sdk-openapi:2.0.0"
+implementation "net.xdow:aliyundrive-sdk-webapi:2.0.0"
 
 //可选
-implementation "net.xdow:webdav:1.3.2"
-implementation "net.xdow:webdav-jakarta:1.3.2"
-implementation "net.xdow:webdav-javax:1.3.2"
-implementation "net.xdow:aliyundrive-webdav-internal:1.3.2"
-implementation "net.xdow:aliyundrive-android-core:1.3.2"
-implementation "net.xdow:jap-http:1.3.2"
-implementation "net.xdow:jap-http-jakarta-adapter:1.3.2"
-implementation "net.xdow:jap-http-javax-adapter:1.3.2"
+implementation "net.xdow:webdav:2.0.0"
+implementation "net.xdow:webdav-jakarta:2.0.0"
+implementation "net.xdow:webdav-javax:2.0.0"
+implementation "net.xdow:aliyundrive-webdav-internal:2.0.0"
+implementation "net.xdow:aliyundrive-android-core:2.0.0"
+implementation "net.xdow:jap-http:2.0.0"
+implementation "net.xdow:jap-http-jakarta-adapter:2.0.0"
+implementation "net.xdow:jap-http-javax-adapter:2.0.0"
 ```
-## 基础用法
+## SDK基础用法
 ```java
 AliyunDrive.newAliyunDrive()
 ```
@@ -181,26 +196,33 @@ AliyunDrive.newAliyunDrive()
 
 > 五群群号：703607910
 
-# 新手教程
+## 新手教程
 ![imaage](./doc/img/openapi_login.gif)
 
-# 客户端兼容性
-| 客户端           |           下载 | 上传 |                 备注                 |
-|:--------------|-------------:| :----: |:----------------------------------:|
-| 群辉Cloud Sync  |         代理模式 | :white_check_mark: |              建议使用单向同步              | 
-| Rclone        | :rocket:直连模式 | :white_check_mark: |  推荐, 支持各个系统, 直连模式需要添加参数, 见下方配置说明   |
-| Mac原生         | :rocket:直连模式 | :white_check_mark: |                                    | 
-| Transmit      | :rocket:直连模式 | :white_check_mark: |                                    | 
-| Windows原生     | :rocket:直连模式 | :white_check_mark: | 有4GB文件传输限制,首次使用还需配置http, 见下方'注意事项' |
-| RaiDrive      | :rocket:直连模式 | :white_check_mark: |          Windows平台下建议用这个           |
-| WinSCP 6.1.1+ | :rocket:直连模式 | :white_check_mark: |          6.1.1以下版本不支持直连模式          |
-| Fileball       | :rocket:直连模式 | :white_check_mark: |                 iOS推荐                 |
-| nPlayer       | :rocket:直连模式 | :white_check_mark: |                                  |
-| MT管理器         | :rocket:直连模式 | :white_check_mark: |                 推荐                 |
-| ES文件浏览器       | :rocket:直连模式 | :white_check_mark: |                                    |
-| Kodi 20.0+    | :rocket:直连模式 | :white_check_mark: |          2023年后编译版本可用直连模式          |
+## 客户端兼容性
+| 客户端           |               下载 |         上传         |                           备注                            |
+|:--------------|-----------------:|:------------------:|:-------------------------------------------------------:|
+| 群辉Cloud Sync  |             代理模式 | :white_check_mark: |                        建议使用单向同步                         | 
+| Rclone        |     :rocket:直连模式 | :white_check_mark: |             推荐, 支持各个系统, 直连模式需要添加参数, 见下方配置说明             |
+| Mac原生         |     :rocket:直连模式 | :white_check_mark: |                                                         | 
+| Transmit      |     :rocket:直连模式 | :white_check_mark: |                                                         | 
+| Windows原生     |     :rocket:直连模式 | :white_check_mark: |         不推荐!有4GB文件传输限制,首次使用还需配置http, 见下方'注意事项'          |
+| RaiDrive      |     :rocket:直连模式 | :white_check_mark: |                     Windows平台下建议用这个                     |
+| WinSCP 6.1.1+ |     :rocket:直连模式 | :white_check_mark: |                    6.1.1以下版本不支持直连模式                     |
+| Fileball      | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |
+| nPlayer       |     :rocket:直连模式 | :white_check_mark: |                           推荐                            |
+| MT管理器         |     :rocket:直连模式 | :white_check_mark: |                           推荐                            |
+| ES文件浏览器       |     :rocket:直连模式 | :white_check_mark: |                                                         |
+| Kodi 20.0+    | ~~:rocket:直连模式~~ | :white_check_mark: |                  ~~2023年后编译版本可用直连模式~~                   |
+| IINA 2.0.0+   |     :rocket:直连模式 | :white_check_mark: |                        macOS 推荐                         |
+| MXPlayer      |     :rocket:直连模式 | :white_check_mark: |                                                         |
+| jetAudio      |     :rocket:直连模式 | :white_check_mark: | 受jetAudio限制,端口号只能为80(http) 或 443(https), 安卓端不可直接监听以上端口! |
+| VLC           | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |
 
-注: 所有客户端均默认支持代理模式
+- 所有客户端均默认支持代理模式
+- ~~:rocket:直连模式~~: 由于阿里云盘目前直链有效期为15分钟, 部分播放器遇阿里云盘链接失效不会主动回webdav请求, 常见表现为播放停止, 无法拖动进度条, 中途直接切换下一集等等, 以上有标注的播放器均默认禁用直连模式, 普通连续下载文件不受影响
+- 请勿使用超过8个线程对直链进行下载, 大概率封号
+- 请勿分享直链, 永封
 
 ## Rclone 配置说明
 - Rclone 1.62.2及以下版本应选择Vendor为Nextcloud以支持rclone自身的数据校验功能
@@ -240,8 +262,7 @@ javascript:var p=document.createElement('p');p.style='text-align:center;margin-t
 添加为浏览器书签, 在https://www.aliyundrive.com/drive/ 页面点击该书签也会弹出refresh_token弹窗
 </details>
 
-# 功能说明
-## 支持的功能
+## 功能说明
 1. 查看文件夹、查看文件
 2. 文件移动目录
 3. 文件重命名
@@ -272,10 +293,12 @@ FileSizeLimitInBytes 改为FFFFFFFF, 也就是最大4GB限制, 改完重启计�
 其他教程: <a href="http://blog.51yip.com/linux/2221.html" target="_blank">文件大小超过允许的限制，无法保存</a></pre>
 </details>
 
-# 免责声明
+7. 直连模式下播放停止, 无法拖动进度条, 中途直接切换下一集等等, 详见[客户端兼容性](#客户端兼容性)
+
+## 免责声明
 1. 本软件为免费开源项目, 无任何形式的盈利行为。
 2. 本软件服务于阿里云盘, 旨在让阿里云盘功能更强大。如有侵权, 请与我联系, 会及时处理。
-3. 本软件皆调用官方接口实现, 无任何“Hack”行为, 无破坏官方接口行为。
+3. 本软件皆调用官方接口实现, 无任何"Hack"行为, 无破坏官方接口行为。
 4. 本软件仅做流量转发, 不拦截、存储、篡改任何用户数据。
 5. 严禁使用本软件进行盈利、损坏官方、散落任何违法信息等行为。
 6. 本软件不作任何稳定性的承诺, 如因使用本软件导致的文件丢失、文件破坏等意外情况, 均与本软件无关。

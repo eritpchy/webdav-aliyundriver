@@ -22,7 +22,6 @@ import net.sf.webdav.*;
 import net.sf.webdav.exceptions.AccessDeniedException;
 import net.sf.webdav.exceptions.LockFailedException;
 import net.sf.webdav.exceptions.WebdavException;
-import net.sf.webdav.fromcatalina.URLEncoder;
 import net.sf.webdav.fromcatalina.XMLHelper;
 import net.sf.webdav.fromcatalina.XMLWriter;
 import net.sf.webdav.locking.LockedObject;
@@ -34,6 +33,7 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -43,11 +43,6 @@ public class DoPropfind extends AbstractMethod {
 
     private static org.slf4j.Logger LOG = org.slf4j.LoggerFactory
             .getLogger(DoPropfind.class);
-
-    /**
-     * Array containing the safe characters set.
-     */
-    protected static URLEncoder URL_ENCODER;
 
     /**
      * PROPFIND - Specify a property mask.
@@ -152,7 +147,7 @@ public class DoPropfind extends AbstractMethod {
                 resp.setContentType("text/xml; charset=UTF-8");
 
                 // Create multistatus object
-                XMLWriter generatedXML = new XMLWriter(resp.getWriter(),
+                XMLWriter generatedXML = new XMLWriter(new OutputStreamWriter(resp.getOutputStream()),
                         namespaces);
                 generatedXML.writeXMLHeader();
                 generatedXML
@@ -163,8 +158,7 @@ public class DoPropfind extends AbstractMethod {
                                     .getMimeType(transaction, path));
                 } else {
                     recursiveParseProperties(transaction, path, req,
-                            generatedXML, propertyFindType, properties, _depth,
-                            _mimeTyper.getMimeType(transaction, path));
+                            generatedXML, propertyFindType, properties, _depth);
                 }
                 generatedXML
                         .writeElement("DAV::multistatus", XMLWriter.CLOSING);
@@ -174,9 +168,10 @@ public class DoPropfind extends AbstractMethod {
                 resp.sendError(WebdavStatus.SC_FORBIDDEN);
             } catch (WebdavException e) {
                 LOG.warn("Sending internal error!", e);
-                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR);
+                resp.sendError(WebdavStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             } catch (JapException e) {
-                e.printStackTrace(); // To change body of catch statement use
+                LOG.warn("DoPropfind JapException", e);
+                // To change body of catch statement use
                 // File | Settings | File Templates.
             } finally {
                 _resourceLocks.unlockTemporaryLockedObjects(transaction, path,
@@ -199,9 +194,9 @@ public class DoPropfind extends AbstractMethod {
      */
     private void recursiveParseProperties(ITransaction transaction,
                                           String currentPath, JapHttpRequest req, XMLWriter generatedXML,
-                                          int propertyFindType, Vector<String> properties, int depth,
-                                          String mimeType) throws WebdavException {
+                                          int propertyFindType, Vector<String> properties, int depth) throws WebdavException {
 
+        String mimeType = _mimeTyper.getMimeType(transaction, currentPath);
         parseProperties(transaction, req, generatedXML, currentPath,
                 propertyFindType, properties, mimeType);
 
@@ -218,8 +213,7 @@ public class DoPropfind extends AbstractMethod {
                 }
                 newPath += name;
                 recursiveParseProperties(transaction, newPath, req,
-                        generatedXML, propertyFindType, properties, depth - 1,
-                        mimeType);
+                        generatedXML, propertyFindType, properties, depth - 1);
             }
         }
     }
@@ -301,6 +295,8 @@ public class DoPropfind extends AbstractMethod {
                     }
                     generatedXML.writeProperty("DAV::getetag", getETag(so));
                     generatedXML.writeElement("DAV::resourcetype", XMLWriter.NO_CONTENT);
+                    generatedXML.writeProperty("DAV::publiclink", String.valueOf(_store.getPublicLink(transaction, path)));
+                    generatedXML.writeProperty("DAV::thumbnail", URL_ENCODER.encode(String.valueOf(so.getThumbnailUrl())));
                 } else {
                     generatedXML.writeElement("DAV::resourcetype", XMLWriter.OPENING);
                     generatedXML.writeElement("DAV::collection", XMLWriter.NO_CONTENT);
@@ -341,6 +337,7 @@ public class DoPropfind extends AbstractMethod {
                 generatedXML.writeElement("DAV::quotaused", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("DAV::quota-available-bytes", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("DAV::quota-used-bytes", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("DAV::quota-used-bytes", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("DAV::creationdate", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("DAV::displayname", XMLWriter.NO_CONTENT);
                 if (!isFolder) {
@@ -353,6 +350,11 @@ public class DoPropfind extends AbstractMethod {
                     generatedXML.writeElement("DAV::getetag", XMLWriter.NO_CONTENT);
                     generatedXML.writeElement("DAV::getlastmodified",
                             XMLWriter.NO_CONTENT);
+                    generatedXML.writeElement("DAV::publiclink",
+                            XMLWriter.NO_CONTENT);
+                    generatedXML.writeElement("DAV::thumbnail",
+                            XMLWriter.NO_CONTENT);
+
                 }
                 generatedXML.writeElement("DAV::resourcetype", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("DAV::supportedlock", XMLWriter.NO_CONTENT);
@@ -456,6 +458,12 @@ public class DoPropfind extends AbstractMethod {
                             if (usedBytes >= 0) {
                                 generatedXML.writeProperty(property, String.valueOf(usedBytes));
                             }
+                            break;
+                        case "DAV::publiclink":
+                            generatedXML.writeProperty(property, String.valueOf(_store.getPublicLink(transaction, path)));
+                            break;
+                        case "DAV::thumbnail":
+                            generatedXML.writeProperty(property, URL_ENCODER.encode(String.valueOf(so.getThumbnailUrl())));
                             break;
                         case NAMESPACE_APPLE_WEBDAVFS + ":appledoubleheader":
                             generatedXML.writeProperty(property, "AAUWBwACAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAJgAAACwAAAAJAAAAMgAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");

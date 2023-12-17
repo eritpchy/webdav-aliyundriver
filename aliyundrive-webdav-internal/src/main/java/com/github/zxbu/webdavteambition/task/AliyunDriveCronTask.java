@@ -1,7 +1,10 @@
-package net.xdow.aliyundrive.config;
+package com.github.zxbu.webdavteambition.task;
 
+import com.github.zxbu.webdavteambition.bean.AFileReqInfo;
+import com.github.zxbu.webdavteambition.inf.IBackgroundTask;
 import com.github.zxbu.webdavteambition.store.AliyunDriveClientService;
 import net.xdow.aliyundrive.bean.AliyunDriveFileInfo;
+import net.xdow.aliyundrive.exception.NotAuthenticatedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AliyunDriveCronTask {
+public class AliyunDriveCronTask implements IBackgroundTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AliyunDriveCronTask.class);
 
@@ -29,8 +32,13 @@ public class AliyunDriveCronTask {
         try {
             LOGGER.info("定时刷新 Refresh Token ↓↓↓↓↓");
             AliyunDriveFileInfo root = mAliyunDriveClientService.getTFileByPath("/");
-            mAliyunDriveClientService.getTFileListCached(root.getFileId());
+            AFileReqInfo rootInfo = AFileReqInfo.from(root);
+            mAliyunDriveClientService.getTFileListCached(rootInfo);
         } catch (Throwable e) {
+            if (e.getCause() instanceof NotAuthenticatedException) {
+                LOGGER.error("阿里云盘登录已失效, 请重新登录!");
+                return;
+            }
             LOGGER.error("", e);
         } finally {
             LOGGER.info("定时刷新 Refresh Token ↑↑↑↑↑");
@@ -44,7 +52,7 @@ public class AliyunDriveCronTask {
                 refreshToken();
                 mTaskPool.schedule(this, getRandomNumber(30, 60), TimeUnit.MINUTES);
             }
-        }, 10, TimeUnit.SECONDS);
+        }, 1, TimeUnit.SECONDS);
     }
 
     public void stop() {

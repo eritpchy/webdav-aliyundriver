@@ -29,6 +29,7 @@ public class AliyunDriveFileInfo extends AliyunDriveResponse.GenericMessageInfo 
     private Date updatedAt;
     private Date localCreatedAt;
     private Date localModifiedAt;
+    private String mimeType;
 
     /**
      * WebApi Only
@@ -43,5 +44,12 @@ public class AliyunDriveFileInfo extends AliyunDriveResponse.GenericMessageInfo 
 
     public boolean isFile() {
         return type == AliyunDriveEnum.Type.File;
+    }
+
+    public String getMimeType() {
+        if ("ts".equalsIgnoreCase(fileExtension)) {
+            return "video/mp2t";
+        }
+        return mimeType;
     }
 }

@@ -55,33 +55,20 @@ public class DoGet extends DoHead {
                 return;
             }
 
+            if (handleCustomGetRequest(transaction, path)) {
+                return;
+            }
+
             String downloadUrl = _store.getResourceDownloadUrlForRedirection(transaction, path);
             if (downloadUrl != null && downloadUrl.length() > 0) {
+                resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0"); // HTTP 1.1.
+                resp.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+                resp.setHeader("Expires", "0"); // Proxies.
                 resp.sendRedirect(downloadUrl);
                 return;
             }
-            OutputStream out = resp.getOutputStream();
-            BufferedOutputStream bos = new BufferedOutputStream(out, 64 * 1024);
-            InputStream in = _store.getResourceContent(transaction, path);
-            BufferedInputStream bis = new BufferedInputStream(in, 64 * 1024);
-            try {
-                if (in != null) {
-                    LOG.debug("开始 {}, ", path);
-                    org.apache.commons.io.IOUtils.copyLarge(bis, bos);
-                    LOG.debug("结束 {}", path);
-                }
-            } finally {
-                // flushing causes a IOE if a file is opened on the webserver
-                // client disconnected before server finished sending response
-                org.apache.commons.io.IOUtils.closeQuietly(bis);
-                org.apache.commons.io.IOUtils.closeQuietly(in);
-                try {
-                    bos.flush();
-                } catch (Exception ignored) {
-                }
-                org.apache.commons.io.IOUtils.closeQuietly(bos);
-                IOUtils.closeQuietly(out);
-            }
+
+            copyInputStream(_store.getResourceContent(transaction, path), resp.getOutputStream());
         } catch (EOFException ignore) {
         } catch (Exception e) {
             String message = e.toString();
@@ -97,7 +84,35 @@ public class DoGet extends DoHead {
                     && !e.getClass().getName().contains(".ClientAbortException")) {
                 LOG.warn("{} doBody causes Exception!\n", path, e);
                 LOG.trace(e.toString());
+                try {
+                    resp.sendError(JapHttpResponse.SC_BAD_REQUEST, message);
+                } catch (Exception ignored) {
+                }
             }
+        }
+    }
+
+    private boolean handleCustomGetRequest(ITransaction transaction, String path) {
+        if (_store.handleCustomGetRequest(transaction, path)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void copyInputStream(InputStream in, OutputStream out) throws IOException {
+        try {
+            in =  IOUtils.buffer(in, 64 * 1024);
+            out = IOUtils.buffer(out, 64 * 1024);
+            org.apache.commons.io.IOUtils.copyLarge(in, out);
+        } finally {
+            // flushing causes a IOE if a file is opened on the webserver
+            // client disconnected before server finished sending response
+            org.apache.commons.io.IOUtils.closeQuietly(in);
+            try {
+                out.flush();
+            } catch (Exception ignored) {
+            }
+            IOUtils.closeQuietly(out);
         }
     }
 
@@ -140,6 +155,11 @@ public class DoGet extends DoHead {
                 childrenTemp.append("</style>");
                 childrenTemp.append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
                 childrenTemp.append("<meta name=\"referrer\" content=\"same-origin\" />");
+                childrenTemp.append("<script>");
+                childrenTemp.append("  if (!window.location.pathname.endsWith('/')) {");
+                childrenTemp.append("    history.replaceState('','',window.location.pathname+'/')");
+                childrenTemp.append("  }");
+                childrenTemp.append("</script>");
                 childrenTemp.append("</head>");
                 childrenTemp.append("<body>");
                 childrenTemp.append(getHeader(transaction, path, resp, req));
@@ -157,7 +177,7 @@ public class DoGet extends DoHead {
                     childrenTemp.append("<a href=\"");
 
                     if (!req.getRequestURI().endsWith("/")) {
-                        childrenTemp.append('/');
+                        childrenTemp.append("./");
                     }
 
                     childrenTemp.append(UrlEscapers.urlFragmentEscaper().escape(child));

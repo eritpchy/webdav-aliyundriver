@@ -9,7 +9,6 @@ import com.github.zxbu.webdavteambition.filter.IErrorWrapperResponse;
 import net.sf.webdav.WebdavStatus;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public class ErrorFilterImpl implements IErrorFilter {
 
@@ -25,19 +24,19 @@ public class ErrorFilterImpl implements IErrorFilter {
         try {
             if (wrapperResponse.hasErrorToSend()) {
                 int status = wrapperResponse.getStatus();
-                res.setStatus(status);
                 String message = wrapperResponse.getMessage();
                 if (message == null) {
                     message = WebdavStatus.getStatusText(status);
                 }
+                res.sendError(status, message);
                 String errorXml = readErrorPage().replace("{{code}}", status + "").replace("{{message}}", message);
-                res.getOutputStream().write(errorXml.getBytes(StandardCharsets.UTF_8));
+                res.write(errorXml);
             }
             res.flushBuffer();
         } catch (Throwable t) {
             try {
                 res.setStatus(500);
-                res.getOutputStream().write(t.getMessage().getBytes(StandardCharsets.UTF_8));
+                res.write(t.getMessage());
                 res.flushBuffer();
             } catch (IOException e) {
             }

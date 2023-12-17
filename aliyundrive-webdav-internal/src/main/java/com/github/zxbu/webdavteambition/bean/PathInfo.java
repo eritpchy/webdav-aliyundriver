@@ -1,4 +1,4 @@
-package com.github.zxbu.webdavteambition.model;
+package com.github.zxbu.webdavteambition.bean;
 
 import lombok.Data;
 

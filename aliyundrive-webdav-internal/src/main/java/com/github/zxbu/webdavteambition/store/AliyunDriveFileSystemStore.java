@@ -2,16 +2,22 @@ package com.github.zxbu.webdavteambition.store;
 
 import com.fujieid.jap.http.JapHttpRequest;
 import com.fujieid.jap.http.JapHttpResponse;
+import com.github.zxbu.webdavteambition.bean.AFileReqInfo;
+import com.github.zxbu.webdavteambition.bean.PathInfo;
 import com.github.zxbu.webdavteambition.config.AliyunDriveProperties;
-import com.github.zxbu.webdavteambition.model.PathInfo;
+import com.github.zxbu.webdavteambition.handler.GetRequestHandlerHolder;
+import com.github.zxbu.webdavteambition.handler.IGetRequestHandler;
 import com.google.common.net.HttpHeaders;
+import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import lombok.Getter;
 import net.sf.webdav.ITransaction;
 import net.sf.webdav.IWebdavStore;
 import net.sf.webdav.StoredObject;
 import net.sf.webdav.Transaction;
 import net.sf.webdav.exceptions.WebdavException;
 import net.sf.webdav.util.ClientIdentifyUtils;
+import net.sf.webdav.util.DateTimeUtils;
 import net.xdow.aliyundrive.bean.AliyunDriveEnum;
 import net.xdow.aliyundrive.bean.AliyunDriveFileInfo;
 import net.xdow.aliyundrive.exception.NotAuthenticatedException;
@@ -19,6 +25,7 @@ import net.xdow.aliyundrive.util.JsonUtils;
 import net.xdow.aliyundrive.webapi.impl.AliyunDriveWebApiImplV1;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +47,11 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AliyunDriveFileSystemStore.class);
 
-    private AliyunDriveClientService mAliyunDriveClientService;
+    @Getter
+    private AliyunDriveClientService aliyunDriveClientService;
 
     public AliyunDriveFileSystemStore(Object[] args, File root) {
-        this.mAliyunDriveClientService = (AliyunDriveClientService) args[0];
+        this.aliyunDriveClientService = (AliyunDriveClientService) args[0];
     }
 
     @Override
@@ -75,7 +83,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
     @Override
     public void createFolder(ITransaction transaction, String folderUri) {
         LOGGER.info("createFolder {}", folderUri);
-        mAliyunDriveClientService.createFolder(folderUri);
+        aliyunDriveClientService.createFolder(folderUri);
     }
 
     @Override
@@ -93,16 +101,34 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
         }
         JapHttpResponse response = transaction.getResponse();
         long size = getResourceLength(transaction, resourceUri);
-        Response downResponse = mAliyunDriveClientService.download(resourceUri, transaction.getRequest(), size);
+        Response downResponse = aliyunDriveClientService.download(resourceUri, transaction.getRequest(), size);
         LOGGER.debug("{} code = {}", resourceUri, downResponse.code());
-        for (String name : downResponse.headers().names()) {
+        Set<String> names = downResponse.headers().names();
+        boolean isPDF = resourceUri.toLowerCase().endsWith(".pdf");
+        for (String name : names) {
+            if (isPDF) {
+                if (HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(name)) {
+                    continue;
+                }
+            }
             //Fix Winscp Invalid Content-Length in response
             if (HttpHeaders.CONTENT_LENGTH.equalsIgnoreCase(name)) {
                 continue;
             }
             LOGGER.debug("{} downResponse: {} = {}", resourceUri, name, downResponse.header(name));
+            if (HttpHeaders.CONTENT_DISPOSITION.equalsIgnoreCase(name)) {
+                if (isPDF) {
+                    String value = downResponse.header(name);
+                    response.addHeader(name, String.valueOf(value).replace("attachment;", "inline;"));
+                    continue;
+                }
+            }
             response.addHeader(name, downResponse.header(name));
         }
+        if (isPDF) {
+            response.setContentType("application/pdf");
+        }
+
         ResponseBody body = downResponse.body();
         if (body == null) {
             response.setContentLengthLong(0L);
@@ -151,7 +177,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
             response.setHeader("X-OC-MTime", "accepted");
         }
 
-        mAliyunDriveClientService.uploadPre(resourceUri, contentLength, content, sha1Sum, modifyTimeSec, response);
+        aliyunDriveClientService.uploadPre(resourceUri, contentLength, content, sha1Sum, modifyTimeSec, response);
 
         if (contentLength == 0) {
             String expect = request.getHeader("Expect");
@@ -175,7 +201,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getChildrenNames: {}", folderUri);
         }
-        AliyunDriveFileInfo tFile = this.mAliyunDriveClientService.getTFileByPath(folderUri);
+        AliyunDriveFileInfo tFile = this.aliyunDriveClientService.getTFileByPath(folderUri);
         if (tFile == null) {
             return new String[0];
         }
@@ -183,7 +209,8 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
             return new String[0];
         }
         try {
-            Set<AliyunDriveFileInfo> tFileList = this.mAliyunDriveClientService.getTFileListCached(tFile.getFileId());
+            AFileReqInfo tFileInfo = AFileReqInfo.from(tFile);
+            Set<AliyunDriveFileInfo> tFileList = this.aliyunDriveClientService.getTFileListCached(tFileInfo);
             List<String> nameList = new ArrayList<>();
             for (AliyunDriveFileInfo file : tFileList) {
                 tFile = file;
@@ -213,7 +240,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
     private long getResourceLength2(ITransaction transaction, String path) {
         long size = 0;
         try {
-            AliyunDriveFileInfo tFile = mAliyunDriveClientService.getTFileByPath(path);
+            AliyunDriveFileInfo tFile = aliyunDriveClientService.getTFileByPath(path);
             return size = getResourceLength2(tFile);
         } finally {
             if (LOGGER.isTraceEnabled()) {
@@ -229,24 +256,24 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
         if (resourceName.startsWith("._")) {
             return;
         }
-        mAliyunDriveClientService.removeByPath(uri);
+        aliyunDriveClientService.removeByPath(uri);
     }
 
     @Override
     public boolean moveObject(ITransaction transaction, String destinationPath, String sourcePath) {
         LOGGER.info("moveObject, destinationPath={}, sourcePath={}", destinationPath, sourcePath);
 
-        PathInfo destinationPathInfo = mAliyunDriveClientService.getPathInfo(destinationPath);
-        PathInfo sourcePathInfo = mAliyunDriveClientService.getPathInfo(sourcePath);
+        PathInfo destinationPathInfo = aliyunDriveClientService.getPathInfo(destinationPath);
+        PathInfo sourcePathInfo = aliyunDriveClientService.getPathInfo(sourcePath);
         // 名字相同，说明是移动目录
         if (sourcePathInfo.getName().equals(destinationPathInfo.getName())) {
-            mAliyunDriveClientService.move(sourcePath, destinationPathInfo.getParentPath());
+            aliyunDriveClientService.move(sourcePath, destinationPathInfo.getParentPath());
         } else {
             if (!destinationPathInfo.getParentPath().equals(sourcePathInfo.getParentPath())) {
                 throw new WebdavException("不支持目录和名字同时修改");
             }
             // 名字不同，说明是修改名字。不考虑目录和名字同时修改的情况
-            mAliyunDriveClientService.rename(sourcePath, destinationPathInfo.getName());
+            aliyunDriveClientService.rename(sourcePath, destinationPathInfo.getName());
         }
         return true;
     }
@@ -264,7 +291,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
                 // OS-X uses these hidden files ...
                 return null;
             }
-            AliyunDriveFileInfo tFile = mAliyunDriveClientService.getTFileByPath(uri);
+            AliyunDriveFileInfo tFile = aliyunDriveClientService.getTFileByPath(uri);
             if (tFile != null) {
                 StoredObject so = new StoredObject();
                 so.setFolder(tFile.getType() == AliyunDriveEnum.Type.Folder);
@@ -274,6 +301,8 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
                 Date localModifyTime = tFile.getLocalModifiedAt();
                 so.setLastModified(localModifyTime != null ? localModifyTime : tFile.getUpdatedAt());
                 so.setSha1sum(tFile.getContentHash());
+                so.setMimeType(tFile.getMimeType());
+                so.setThumbnailUrl(tFile.getThumbnail());
                 return result = so;
             }
             return result = null;
@@ -284,17 +313,17 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
 
     @Override
     public long getQuotaAvailableBytes(ITransaction transaction) {
-        return mAliyunDriveClientService.getQuotaAvailableBytes();
+        return aliyunDriveClientService.getQuotaAvailableBytes();
     }
 
     @Override
     public long getQuotaUsedBytes(ITransaction transaction) {
-        return mAliyunDriveClientService.getQuotaUsedBytes();
+        return aliyunDriveClientService.getQuotaUsedBytes();
     }
 
     @Override
     public String getFooter(ITransaction transaction) {
-        if (this.mAliyunDriveClientService.getAliyunDrive() instanceof AliyunDriveWebApiImplV1) {
+        if (this.aliyunDriveClientService.getAliyunDrive() instanceof AliyunDriveWebApiImplV1) {
             return "<br/><form action=\"/\">\n" +
                     "  <label for=\"refresh_token\">更换RefreshToken: </label>\n" +
                     "  <input type=\"text\" id=\"refresh_token\" name=\"refresh_token\">\n" +
@@ -306,27 +335,70 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
 
     @Override
     public String getResourceDownloadUrlForRedirection(ITransaction transaction, String path) {
-        AliyunDriveProperties.DownloadProxyMode mode = this.mAliyunDriveClientService.getProperties().getDownloadProxyMode();
+        JapHttpRequest request = transaction.getRequest();
+        String userAgent = request.getHeader("User-Agent");
+        String referer = request.getHeader("Referer");
+        AliyunDriveProperties.DownloadProxyMode mode = this.aliyunDriveClientService.getProperties().getDownloadProxyMode();
         switch (mode) {
             case Proxy:
                 return null;
-            default:
-                JapHttpRequest request = transaction.getRequest();
-                String userAgent = request.getHeader("User-Agent");
-                String referer = request.getHeader("Referer");
+            case Direct:
                 if (ClientIdentifyUtils.isWinSCP5AndBelow(userAgent)
-                        || ClientIdentifyUtils.isSynoCloudSync(userAgent) || ClientIdentifyUtils.isKodi19AndBelow(userAgent)
+                        || ClientIdentifyUtils.isSynoCloudSync(userAgent)
                         || ClientIdentifyUtils.checkAliyunDriveRefererForProxyMode(referer)) {
-                    if (mode == AliyunDriveProperties.DownloadProxyMode.Direct) {
-                        throw new WebdavException("DirectModeUnsupportedCode",
+                    throw new WebdavException("DirectModeUnsupportedCode",
                             "This client is not support Direct mode, please consider switch to Proxy mode, or Auto mode.");
-                    } else {
-                        LOGGER.warn("Using Proxy mode User-Agent: {} Referer: {}", userAgent, referer);
-                        return null;
-                    }
                 }
-                return this.mAliyunDriveClientService.getDownloadUrlByPath(path);
+                break;
+            default:
+                if (ClientIdentifyUtils.isWinSCP5AndBelow(userAgent)
+                        || ClientIdentifyUtils.isSynoCloudSync(userAgent)
+                        || ClientIdentifyUtils.isKodi(userAgent)
+                        || ClientIdentifyUtils.isAppleCoreMedia(userAgent)
+                        || ClientIdentifyUtils.isVLC(userAgent)
+                        || ClientIdentifyUtils.checkAliyunDriveRefererForProxyMode(referer)) {
+                    LOGGER.warn("Using Proxy mode User-Agent: {} Referer: {}", userAgent, referer);
+                    return null;
+                }
         }
+
+        String url = this.aliyunDriveClientService.getDownloadUrlByPath(path);
+        if (!request.isSecure()) {
+            url = url.replaceAll("^https://", "http://");
+        }
+        return url;
+    }
+
+    @Override
+    public String getPublicLink(ITransaction transaction, String path) {
+        path = UrlEscapers.urlFragmentEscaper().escape(path);
+        AliyunDriveProperties properties = this.aliyunDriveClientService.getProperties();
+        String shareToken = properties.getShareToken();
+        long shareExpireSec = properties.getShareExpireSec();
+        long expire = (shareExpireSec > 0) ? DateTimeUtils.getCurrentDateGMT().getTime() / 1000 + shareExpireSec: 0;
+        String hash = DigestUtils.sha1Hex(path + "_" + shareToken + "_" + expire);
+        return String.format("%s?p=%s%s", path, hash, expire > 0 ? "%26expire=" + expire: "");
+    }
+
+    @Override
+    public boolean handleCustomGetRequest(ITransaction transaction, String path) {
+        JapHttpRequest request = transaction.getRequest();
+        String action = request.getParameter("action");
+        if (StringUtils.isEmpty(action)){
+            return false;
+        }
+        IGetRequestHandler handler = GetRequestHandlerHolder.INSTANCE.get(action);
+        if (handler == null) {
+            return false;
+        }
+        try {
+            if (handler.handle(this, transaction, path)) {
+                return true;
+            }
+        } catch (IOException e) {
+            throw new WebdavException(e);
+        }
+        return false;
     }
 
     protected String resourceNameFromResourcePath( String path ) {

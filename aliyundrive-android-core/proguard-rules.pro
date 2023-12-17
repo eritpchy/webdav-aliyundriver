@@ -22,14 +22,16 @@
 -keepclassmembers class com.github.zxbu.webdavteambition.**,
     net.sf.webdav.WebdavServlet,
     com.github.zxbu.webdavteambition.store.AliYunDriverFileSystemStore,
-    net.xdow.aliyundrive.filter.ErrorFilter {
+    net.xdow.aliyundrive.filter.ErrorFilter,
+    org.eclipse.jetty.servlets.CrossOriginFilter {
    public *;
 }
 -keep class net.sf.webdav.WebdavServlet
 -keep class net.xdow.aliyundrive.servlet.WebdavServletInit
 -keep class com.github.zxbu.webdavteambition.store.AliYunDriverFileSystemStore
+-keep class org.eclipse.jetty.servlets.CrossOriginFilter
 -keep class net.xdow.aliyundrive.filter.ErrorFilter
--keep class com.github.zxbu.webdavteambition.store.StartupService
+-keep class com.github.zxbu.webdavteambition.servlet.impl.StartupServletImpl
 -dontobfuscate
 -dontoptimize
 -dontpreverify

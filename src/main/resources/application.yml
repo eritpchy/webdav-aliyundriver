@@ -21,3 +21,17 @@ server:
   tomcat:
     connection-timeout: 1d
   port: 8080
+  error:
+    whitelabel:
+      enabled: true
+    include-message: always
+    include-binding-errors: always
+    include-exception: true
+    include-stacktrace: always
+
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false

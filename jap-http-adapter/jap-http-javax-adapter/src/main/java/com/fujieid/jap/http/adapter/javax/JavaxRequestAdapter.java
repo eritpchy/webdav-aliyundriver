@@ -3,16 +3,17 @@ package com.fujieid.jap.http.adapter.javax;
 import com.fujieid.jap.http.JapHttpCookie;
 import com.fujieid.jap.http.JapHttpRequest;
 import com.fujieid.jap.http.JapHttpSession;
+import com.fujieid.jap.http.JapPart;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author yadong.zhang (yadong.zhang0415(a)gmail.com)
@@ -216,6 +217,11 @@ public class JavaxRequestAdapter implements JapHttpRequest {
     }
 
     @Override
+    public Object getServletContextAttribute(String name) {
+        return this.request.getServletContext().getAttribute(name);
+    }
+
+    @Override
     public String getRequestURI() {
         return this.request.getRequestURI();
     }
@@ -253,5 +259,42 @@ public class JavaxRequestAdapter implements JapHttpRequest {
     @Override
     public Enumeration<String> getParameterNames() {
         return this.request.getParameterNames();
+    }
+
+    @Override
+    public Collection<JapPart> getParts() throws IOException {
+        try {
+            List<JapPart> japParts = new ArrayList<>();
+            Collection<Part> parts = this.request.getParts();
+            for (final Part part : parts) {
+                japParts.add(new JavaxJapPart(part));
+            }
+            return japParts;
+        } catch (ServletException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public JapPart getPart(String name) throws IOException {
+        try {
+            Part part = this.request.getPart(name);
+            if (part == null) {
+                return null;
+            }
+            return new JavaxJapPart(part);
+        } catch (ServletException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public String getScheme() {
+        return this.request.getScheme();
+    }
+
+    @Override
+    public boolean isSecure() {
+        return this.request.isSecure();
     }
 }
