@@ -6,7 +6,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && DEBIAN_FRONTEND=noninteractive apt install -y curl build-essential libz-dev zlib1g-dev
 RUN curl -sL https://get.graalvm.org/jdk | bash -s --
 ENV LANG=C.UTF-8
-RUN cd /graalvm-ce-java* \
+RUN cd /graalvm* \
     && GRAALVM_PATH=$(pwd)  \
     && echo $GRAALVM_PATH \
     && echo "export PATH=\"$GRAALVM_PATH/bin:\$PATH\"" >> /tmp/env \
