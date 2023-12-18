@@ -125,6 +125,7 @@ sudo kubectl apply -f k8s_app.yaml</pre>
 ## 连接说明
 ### 4.0.0及以上版本
 文件管理: http://{ip地址}:{端口号}/
+
 Webdav: http://{ip地址}:{端口号}/dav
 
 例如: http://127.0.0.1:8080/dav
@@ -203,10 +204,10 @@ AliyunDrive.newAliyunDrive()
 | 客户端           |               下载 |         上传         |                           备注                            |
 |:--------------|-----------------:|:------------------:|:-------------------------------------------------------:|
 | 群辉Cloud Sync  |             代理模式 | :white_check_mark: |                        建议使用单向同步                         | 
-| Rclone        |     :rocket:直连模式 | :white_check_mark: |             推荐, 支持各个系统, 直连模式需要添加参数, 见下方配置说明             |
+| Rclone        |     :rocket:直连模式 | :white_check_mark: |             推荐, 支持各个系统, 直连模式需要添加参数,<br/>见下方配置说明             |
 | Mac原生         |     :rocket:直连模式 | :white_check_mark: |                                                         | 
 | Transmit      |     :rocket:直连模式 | :white_check_mark: |                                                         | 
-| Windows原生     |     :rocket:直连模式 | :white_check_mark: |         不推荐!有4GB文件传输限制,首次使用还需配置http, 见下方'注意事项'          |
+| Windows原生     |     :rocket:直连模式 | :white_check_mark: |         不推荐!有4GB文件传输限制,首次使用还需配置http,<br/>见下方'注意事项'          |
 | RaiDrive      |     :rocket:直连模式 | :white_check_mark: |                     Windows平台下建议用这个                     |
 | WinSCP 6.1.1+ |     :rocket:直连模式 | :white_check_mark: |                    6.1.1以下版本不支持直连模式                     |
 | Fileball      | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |
@@ -216,7 +217,7 @@ AliyunDrive.newAliyunDrive()
 | Kodi 20.0+    | ~~:rocket:直连模式~~ | :white_check_mark: |                  ~~2023年后编译版本可用直连模式~~                   |
 | IINA 2.0.0+   |     :rocket:直连模式 | :white_check_mark: |                        macOS 推荐                         |
 | MXPlayer      |     :rocket:直连模式 | :white_check_mark: |                                                         |
-| jetAudio      |     :rocket:直连模式 | :white_check_mark: | 受jetAudio限制,端口号只能为80(http) 或 443(https), 安卓端不可直接监听以上端口! |
+| jetAudio      |     :rocket:直连模式 | :white_check_mark: | 受jetAudio限制,端口号只能为80(http) 或 443(https),<br/>安卓端不可直接监听以上端口! |
 | VLC           | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |
 
 - 所有客户端均默认支持代理模式
