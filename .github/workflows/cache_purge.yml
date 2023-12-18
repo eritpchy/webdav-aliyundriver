@@ -1,0 +1,39 @@
+name: Cache Purge
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Build Docker Image"
+      - "Build Jar"
+      - "Build Linux"
+      - "Build Windows"
+      - "Release Published"
+    types:
+      - completed
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge User Cache
+        run: |
+          curl --location --request POST "${WEBDAV_ADDRESS%/*}/api/admin/user/del_cache?username=guest" \
+            --header "Authorization: $ALIST_TOKEN"
+        env:
+          ALIST_TOKEN: ${{secrets.ALIST_TOKEN}}
+          WEBDAV_ADDRESS: ${{secrets.WEBDAV_ADDRESS_R}}
+        shell: bash
+      - name: Purge List Cache
+        run: |
+          curl --location "${WEBDAV_ADDRESS%/*}/api/fs/list" \
+            --header "Authorization: $ALIST_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data '{ "path": "/download/aliyundriver", "password": "", "page": 1, "per_page": 0, "refresh": true}'
+        env:
+          ALIST_TOKEN: ${{secrets.ALIST_TOKEN}}
+          WEBDAV_ADDRESS: ${{secrets.WEBDAV_ADDRESS_R}}
+        shell: bash
+
+
