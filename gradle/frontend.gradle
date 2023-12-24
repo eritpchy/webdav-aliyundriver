@@ -15,7 +15,7 @@ abstract class DownloadTask extends DefaultTask {
         def remoteVersion = parsedJson.name
         println("remoteVersion: ${remoteVersion}")
         def destInfo = parsedJson.assets[0]
-        def distFile = new File(project.buildDir, "resources/main/com/github/zxbu/webdavteambition/frontend.tar.xz")
+        def distFile = new File(project.buildDir, "tmp/resources/main/com/github/zxbu/webdavteambition/frontend.tar.xz")
         distFile.parentFile.mkdirs()
 
         if (isUpToDated(distFile.parentFile, remoteVersion)) {
@@ -43,6 +43,14 @@ abstract class DownloadTask extends DefaultTask {
         def parsedJson = new JsonSlurper().parseText( versionFile.text ) as Map
         String localVersion = parsedJson.version
         return localVersion.equalsIgnoreCase(remoteVersion)
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources", "build/tmp/resources/main"
+        }
     }
 }
 
