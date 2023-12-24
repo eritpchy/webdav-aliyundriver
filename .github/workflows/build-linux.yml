@@ -50,10 +50,10 @@ jobs:
         if:  matrix.target.suffix  == 'linux'
       -
         name: Setup Graalvm
-        uses: graalvm/setup-graalvm@v1.0.12
+        uses: graalvm/setup-graalvm@v1
         with:
-          version: '22.3.2'
           java-version: '17'
+          distribution: 'graalvm'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           cache: 'gradle'
