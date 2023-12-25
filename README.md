@@ -295,7 +295,7 @@ FileSizeLimitInBytes 改为FFFFFFFF, 也就是最大4GB限制, 改完重启计�
 </details>
 
 7. 直连模式下播放停止, 无法拖动进度条, 中途直接切换下一集等等, 详见[客户端兼容性](#客户端兼容性)
-8. 部分设备浏览器内核较老(比如索尼电视), 程序启动时会自动加载浏览器内核, 如无法加载, 请手动下载并安装, 下载地址: [镜像链接](https://file.xdow.net/aliyundriver/浏览器内核包) 或 [
+8. 部分设备浏览器内核较老(比如索尼电视), 程序启动时会自动加载浏览器内核, 如无法加载, 请根据您的设备类型选择其中一个版本手动下载并安装, 下载地址: [镜像链接](https://file.xdow.net/aliyundriver/浏览器内核包) 或 [
 Android System WebView](https://www.apkmirror.com/uploads/?appcategory=android-system-webview)
 
 ## 免责声明
