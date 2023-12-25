@@ -187,15 +187,7 @@ AliyunDrive.newAliyunDrive()
 ```
 
 # QQ群
-> 群号（已满）：789738128
-
-> 二群群号（已满）：979024890
-
-> 三群群号（已满）：212673498
-
-> 四群群号（已满）：752067171
-
-> 五群群号：703607910
+<img src="https://github.com/eritpchy/aliyundrive-webdav/assets/8630635/f7242176-dd43-40c5-80a7-7657b53f4be4" alt="QQ交流群: [789738128]" width="500">
 
 ## 新手教程
 ![imaage](./doc/img/openapi_login.gif)
