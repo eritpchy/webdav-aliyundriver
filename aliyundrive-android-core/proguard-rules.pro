@@ -32,13 +32,7 @@
 -keep class org.eclipse.jetty.servlets.CrossOriginFilter
 -keep class net.xdow.aliyundrive.filter.ErrorFilter
 -keep class com.github.zxbu.webdavteambition.servlet.impl.StartupServletImpl
--dontobfuscate
--dontoptimize
--dontpreverify
--dontshrink
--dontskipnonpubliclibraryclasses
--dontskipnonpubliclibraryclassmembers
--dontusemixedcaseclassnames
+-keep class com.github.zxbu.webdavteambition.store.AliyunDriveFileSystemStore
 -keepattributes SourceFile,LineNumberTable
 #aliyundrive-sdk
 -keep class net.xdow.aliyundrive.** {*;}
