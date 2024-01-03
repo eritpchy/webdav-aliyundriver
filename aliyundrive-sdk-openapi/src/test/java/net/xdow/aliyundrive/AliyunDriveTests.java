@@ -53,6 +53,8 @@ public class AliyunDriveTests {
     private String mWebApiDeviceId;
     private String mTestShareId;
     private String mTestSharePassword;
+    private AliyunDriveWebApiImplV1 webApi = new AliyunDriveWebApiImplV1();
+
 
 
     public AliyunDriveTests() throws Exception {
@@ -69,7 +71,9 @@ public class AliyunDriveTests {
         this.mWebApiDeviceId = this.mLocalProperties.getProperty("web_api_device_id");
         this.mTestShareId = this.mLocalProperties.getProperty("test_share_id");
         this.mTestSharePassword = this.mLocalProperties.getProperty("test_share_password");
+        this.mDefaultDriveId = this.mLocalProperties.getProperty("default_drive_id");
         input.close();
+        webApiAuthorize();
     }
 
     @Test
@@ -358,7 +362,7 @@ public class AliyunDriveTests {
     @Order(14)
     public void testFileMove() {
         AliyunDriveRequest.FileMoveInfo query = new AliyunDriveRequest.FileMoveInfo(
-                this.mDefaultDriveId, this.mFileUploadFileId, "root"
+                this.mDefaultDriveId, this.mDefaultDriveId, this.mFileUploadFileId, "root"
         );
         AliyunDriveResponse.FileMoveInfo res = this.mAliyunDriveClient.fileMove(query).execute();
         System.out.println("FileMoveInfo: " + JsonUtils.toJsonPretty(res));
@@ -368,7 +372,7 @@ public class AliyunDriveTests {
     @Order(14)
     public void testFileCopy() {
         AliyunDriveRequest.FileCopyInfo query = new AliyunDriveRequest.FileCopyInfo(
-                this.mDefaultDriveId, this.mFileUploadFileId, "root"
+                this.mDefaultDriveId, this.mFileUploadFileId, this.mDefaultDriveId, "root"
         );
         query.setAutoRename(true);
         AliyunDriveResponse.FileCopyInfo res = this.mAliyunDriveClient.fileCopy(query).execute();
@@ -432,34 +436,6 @@ public class AliyunDriveTests {
         assertTrue(res.getItems().size() > 0);
         this.mRootFileListInfo = res;
 
-        AliyunDriveWebApiImplV1 webApi = new AliyunDriveWebApiImplV1();
-
-        AliyunDriveResponse.AccessTokenInfo token = new AliyunDriveResponse.AccessTokenInfo();
-        token.setRefreshToken(this.mWebApiRefreshToken);
-        token.setAccessToken(this.mWebApiAccessToken);
-        token.setTokenType("Bearer");
-        webApi.setAccessTokenInfo(token);
-
-        webApi.setAuthorizer(new IAliyunDriveAuthorizer() {
-
-            @Override
-            public AliyunDriveResponse.AccessTokenInfo acquireNewAccessToken(AliyunDriveResponse.AccessTokenInfo oldAccessTokenInfo) {
-                return token;
-            }
-
-            @Override
-            public <T> T onAuthorizerEvent(String eventId, Object data, Class<T> resultCls) {
-                switch (eventId) {
-                    case AliyunDriveWebConstant.Event.ACQUIRE_DEVICE_ID: {
-                        return (T) AliyunDriveTests.this.mWebApiDeviceId;
-                    }
-                    case AliyunDriveWebConstant.Event.ACQUIRE_SESSION_SIGNATURE: {
-                        return (T) AliyunDriveTests.this.mWebApiSignature;
-                    }
-                }
-                return null;
-            }
-        });
         String shareId = this.mTestShareId;
         String sharePassword = this.mTestSharePassword;
 
@@ -494,5 +470,64 @@ public class AliyunDriveTests {
         System.out.println("ShareSaveInfo: " + JsonUtils.toJsonPretty(shareSaveRes));
         assertTrue(!shareSaveRes.isError());
         assertTrue(!shareSaveRes.getFileId().isEmpty());
+    }
+
+    @Test
+    @Order(20)
+    public void testFileDirectTransfer() {
+        String shareId = "kA0c1ihtZdYQOXnxm1KE";
+        String sharePassword = "";
+        AliyunDriveWebResponse.ShareTokenInfo shareTokenRes = webApi.directTransferToken(new AliyunDriveWebRequest.ShareTokenInfo(shareId, sharePassword)).execute();
+        System.out.println("ShareTokenInfo: " + JsonUtils.toJsonPretty(shareTokenRes));
+        assertTrue(!shareTokenRes.isError());
+        assertTrue(!shareTokenRes.getShareToken().isEmpty());
+
+        AliyunDriveWebRequest.DirectTransferSaveInfo testFileDirectTransferSaveQuery = new AliyunDriveWebRequest.DirectTransferSaveInfo(shareId);
+        testFileDirectTransferSaveQuery.setShareToken(shareTokenRes.getShareToken());
+        AliyunDriveWebResponse.DirectTransferSaveInfo testFileDirectTransferSaveRes = webApi.directTransferSave(testFileDirectTransferSaveQuery).execute();
+        System.out.println("testFileDirectTransferSaveRes: " + JsonUtils.toJsonPretty(testFileDirectTransferSaveRes));
+        assertTrue(!testFileDirectTransferSaveRes.isError());
+        assertTrue(!testFileDirectTransferSaveRes.getFileId().isEmpty());
+
+        AliyunDriveWebResponse.DirectTransferGetFileInfo directTransferGetFileRes = webApi.directTransferGetFile(new AliyunDriveWebRequest.DirectTransferGetFileInfo(shareId)).execute();
+        System.out.println("directTransferGetFileRes: " + JsonUtils.toJsonPretty(directTransferGetFileRes));
+
+    }
+
+    @Test
+    @Order(21)
+    public void testFileRestoreFromTrash() {
+        AliyunDriveResponse.GenericMessageInfo res = webApi.fileRestoreFromTrash(
+                new AliyunDriveRequest.FileRestoreFromTrashInfo(mDefaultDriveId, "659516f22b76ccc4dd0044c689cd95671fe102a2")).execute();
+        System.out.println("fileRestoreFromTrash: " + JsonUtils.toJsonPretty(res));
+        assertFalse(res.isError());
+    }
+
+    private void webApiAuthorize() {
+        AliyunDriveResponse.AccessTokenInfo token = new AliyunDriveResponse.AccessTokenInfo();
+        token.setRefreshToken(this.mWebApiRefreshToken);
+        token.setAccessToken(this.mWebApiAccessToken);
+        token.setTokenType("Bearer");
+        webApi.setAccessTokenInfo(token);
+        webApi.setAuthorizer(new IAliyunDriveAuthorizer() {
+
+            @Override
+            public AliyunDriveResponse.AccessTokenInfo acquireNewAccessToken(AliyunDriveResponse.AccessTokenInfo oldAccessTokenInfo) {
+                return token;
+            }
+
+            @Override
+            public <T> T onAuthorizerEvent(String eventId, Object data, Class<T> resultCls) {
+                switch (eventId) {
+                    case AliyunDriveWebConstant.Event.ACQUIRE_DEVICE_ID: {
+                        return (T) AliyunDriveTests.this.mWebApiDeviceId;
+                    }
+                    case AliyunDriveWebConstant.Event.ACQUIRE_SESSION_SIGNATURE: {
+                        return (T) AliyunDriveTests.this.mWebApiSignature;
+                    }
+                }
+                return null;
+            }
+        });
     }
 }

@@ -48,6 +48,7 @@ public class AliyunDriveRequest {
         private Integer videoThumbnailTimeMS;
         private Integer videoThumbnailWidth;
         private Integer imageThumbnailWidth;
+        private String videoThumbnailProcess;
     }
 
     @Data
@@ -192,6 +193,14 @@ public class AliyunDriveRequest {
 
     @Data
     public static class FileMoveToTrashInfo {
+        @NonNull
+        private String driveId;
+        @NonNull
+        private String fileId;
+    }
+
+    @Data
+    public static class FileRestoreFromTrashInfo {
         @NonNull
         private String driveId;
         @NonNull

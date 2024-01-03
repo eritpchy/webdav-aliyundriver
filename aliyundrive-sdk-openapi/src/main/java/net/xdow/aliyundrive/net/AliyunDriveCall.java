@@ -44,6 +44,9 @@ public class AliyunDriveCall<T extends AliyunDriveResponse.GenericMessageInfo> e
         try {
             Response response = this.mCall.execute();
             String content = response.body().string();
+            if (response.code() == 204) {
+                content = "{}";
+            }
             T t = (T) JsonUtils.fromJson(content, this.mEntityBeanType);
             checkAuthorize(t);
             MockResultCallback<T> mockResultOnSuccessCallback = this.mMockResultOnSuccessCallback;
@@ -99,6 +102,9 @@ public class AliyunDriveCall<T extends AliyunDriveResponse.GenericMessageInfo> e
             public void onResponse(Call call, Response response) throws IOException {
                 try {
                     String content = response.body().string();
+                    if (response.code() == 204) {
+                        content = "{}";
+                    }
                     T t = (T) JsonUtils.fromJson(content, AliyunDriveCall.this.mEntityBeanType);
                     checkAuthorize(t);
                     MockResultCallback<T> mockResultOnSuccessCallback = AliyunDriveCall.this.mMockResultOnSuccessCallback;

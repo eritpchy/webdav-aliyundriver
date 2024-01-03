@@ -53,6 +53,23 @@ public class AliyunDriveWebRequest {
     }
 
     @Data
+    public static class DirectTransferGetFileInfo extends AliyunDriveWebShareRequestInfo {
+        @NonNull
+        private String shareId;
+        private String fileId;
+        private String category;
+        @SerializedName("video_thumbnail_time")
+        private Long videoThumbnailTimeMS;
+        private Integer videoThumbnailWidth;
+        private Integer imageThumbnailWidth;
+        private String videoThumbnailProcess = "video/snapshot,t_1000,f_jpg,ar_auto,w_300";
+
+        public void setThumbnailTimeMs(long time_ms) {
+            setVideoThumbnailProcess("video/snapshot,t_" + time_ms + ",f_jpg,ar_auto,w_300");
+        }
+    }
+
+    @Data
     public static class ShareSaveInfo extends AliyunDriveWebShareRequestInfo {
         @NonNull
         private String shareId;
@@ -63,5 +80,11 @@ public class AliyunDriveWebRequest {
         @NonNull
         private String toParentFileId;
         private boolean autoRename = true;
+    }
+
+    @Data
+    public static class DirectTransferSaveInfo extends AliyunDriveWebShareRequestInfo {
+        @NonNull
+        private String shareId;
     }
 }

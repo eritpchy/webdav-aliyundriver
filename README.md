@@ -168,18 +168,18 @@ implementation "com.squareup.okhttp3:logging-interceptor:3.12.13" //api19
 implementation "com.google.code.gson:gson:2.8.9"
 
 //主要
-implementation "net.xdow:aliyundrive-sdk-openapi:2.0.0"
-implementation "net.xdow:aliyundrive-sdk-webapi:2.0.0"
+implementation "net.xdow:aliyundrive-sdk-openapi:2.0.1"
+implementation "net.xdow:aliyundrive-sdk-webapi:2.0.1"
 
 //可选
-implementation "net.xdow:webdav:2.0.0"
-implementation "net.xdow:webdav-jakarta:2.0.0"
-implementation "net.xdow:webdav-javax:2.0.0"
-implementation "net.xdow:aliyundrive-webdav-internal:2.0.0"
-implementation "net.xdow:aliyundrive-android-core:2.0.0"
-implementation "net.xdow:jap-http:2.0.0"
-implementation "net.xdow:jap-http-jakarta-adapter:2.0.0"
-implementation "net.xdow:jap-http-javax-adapter:2.0.0"
+implementation "net.xdow:webdav:2.0.1"
+implementation "net.xdow:webdav-jakarta:2.0.1"
+implementation "net.xdow:webdav-javax:2.0.1"
+implementation "net.xdow:aliyundrive-webdav-internal:2.0.1"
+implementation "net.xdow:aliyundrive-android-core:2.0.1"
+implementation "net.xdow:jap-http:2.0.1"
+implementation "net.xdow:jap-http-jakarta-adapter:2.0.1"
+implementation "net.xdow:jap-http-javax-adapter:2.0.1"
 ```
 ## SDK基础用法
 ```java
@@ -207,7 +207,7 @@ AliyunDrive.newAliyunDrive()
 | MT管理器         |     :rocket:直连模式 | :white_check_mark: |                           推荐                            |
 | ES文件浏览器       |     :rocket:直连模式 | :white_check_mark: |                                                         |
 | Kodi 20.0+    | ~~:rocket:直连模式~~ | :white_check_mark: |                  ~~2023年后编译版本可用直连模式~~                   |
-| IINA 2.0.0+   |     :rocket:直连模式 | :white_check_mark: |                        macOS 推荐                         |
+| IINA 2.0.1+   |     :rocket:直连模式 | :white_check_mark: |                        macOS 推荐                         |
 | MXPlayer      |     :rocket:直连模式 | :white_check_mark: |                                                         |
 | jetAudio      |     :rocket:直连模式 | :white_check_mark: | 受jetAudio限制,端口号只能为80(http) 或 443(https),<br/>安卓端不可直接监听以上端口! |
 | VLC           | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |

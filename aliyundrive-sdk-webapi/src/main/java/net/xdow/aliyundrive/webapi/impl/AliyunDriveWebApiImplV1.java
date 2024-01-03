@@ -419,6 +419,11 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
                 });
     }
 
+    public AliyunDriveCall<AliyunDriveResponse.GenericMessageInfo> fileRestoreFromTrash(final AliyunDriveRequest.FileRestoreFromTrashInfo query) {
+        return postApiRequest(AliyunDriveWebConstant.API_FILE_RESTORE_FROM_TRASH, query,
+                AliyunDriveResponse.GenericMessageInfo.class, FLAG_API_AUTHENTICATION_CALL);
+    }
+
     @Override
     public AliyunDriveCall<AliyunDriveResponse.FileDeleteInfo> fileDelete(final AliyunDriveRequest.FileDeleteInfo query) {
         return postApiRequest(AliyunDriveWebConstant.API_FILE_DELETE, query,
@@ -510,6 +515,22 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
                 AliyunDriveFileInfo.class, FLAG_API_ANONYMOUS_CALL);
     }
 
+    public AliyunDriveCall<AliyunDriveWebResponse.ShareTokenInfo> directTransferToken(AliyunDriveWebRequest.ShareTokenInfo query) {
+        return postApiRequest(AliyunDriveWebConstant.API_DIRECT_TRANSFER_TOKEN, query,
+                AliyunDriveWebResponse.ShareTokenInfo.class, FLAG_API_ANONYMOUS_CALL);
+    }
+
+    public AliyunDriveCall<AliyunDriveWebResponse.DirectTransferSaveInfo> directTransferSave(AliyunDriveWebRequest.DirectTransferSaveInfo query) {
+        return postApiRequest(AliyunDriveWebConstant.API_DIRECT_TRANSFER_SAVE, query,
+                AliyunDriveWebResponse.DirectTransferSaveInfo.class, FLAG_API_AUTHENTICATION_CALL);
+    }
+
+    public AliyunDriveCall<AliyunDriveWebResponse.DirectTransferGetFileInfo> directTransferGetFile(AliyunDriveWebRequest.DirectTransferGetFileInfo query) {
+        query.setSkipShareToken(true);
+        return postApiRequest(AliyunDriveWebConstant.API_DIRECT_TRANSFER_GET_FILE, query,
+                AliyunDriveWebResponse.DirectTransferGetFileInfo.class, FLAG_API_ANONYMOUS_CALL);
+    }
+
     private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveWebCall<T> postApiRequest(
             String url, Class<? extends AliyunDriveResponse.GenericMessageInfo> classOfT, int flags) {
         return (AliyunDriveWebCall<T>) postApiRequest(url, null, classOfT, flags);
@@ -519,11 +540,14 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
             String url, Object object, Class<T> classOfT, int flags) {
         Request.Builder builder = new Request.Builder();
         if (object instanceof AliyunDriveWebShareRequestInfo) {
-            String shareToken = ((AliyunDriveWebShareRequestInfo) object).getShareToken();
-            if (StringUtils.isEmpty(shareToken)) {
-                throw new IllegalArgumentException("share_token is required");
+            AliyunDriveWebShareRequestInfo shareRequestInfo = ((AliyunDriveWebShareRequestInfo) object);
+            if (!shareRequestInfo.isSkipShareToken()) {
+                String shareToken = shareRequestInfo.getShareToken();
+                if (StringUtils.isEmpty(shareToken)) {
+                    throw new IllegalArgumentException("share_token is required");
+                }
+                builder.addHeader("X-Share-Token", shareToken);
             }
-            builder.addHeader("X-Share-Token", shareToken);
         }
         builder.url(url);
         if (object == null) {
