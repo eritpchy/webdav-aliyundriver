@@ -59,7 +59,11 @@ public class WebdavServletBeanImpl implements IWebdavServletBean {
         IMimeTyper mimeTyper = new IMimeTyper() {
             @Override
             public String getMimeType(ITransaction transaction, String path) {
-                String retVal = _store.getStoredObject(transaction, path).getMimeType();
+                StoredObject so = _store.getStoredObject(transaction, path);
+                if (so == null) {
+                    return null;
+                }
+                String retVal = so.getMimeType();
                 if (retVal == null) {
                     retVal = WebdavServletBeanImpl.this.mWebdavServletBeanServletCall.getMimeType(path);
                 }
