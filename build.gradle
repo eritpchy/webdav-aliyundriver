@@ -64,6 +64,7 @@ graalvmNative {
             buildArgs.add('--allow-incomplete-classpath')
             buildArgs.add('--enable-url-protocols=http,https')
             buildArgs.add('--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl')
+            buildArgs.add('-march=compatibility')
         }
     }
 }
@@ -73,7 +74,9 @@ bootBuildImage {
     environment = [
             'BP_JVM_VERSION'                 : "17",
             'BP_NATIVE_IMAGE'                : 'true',
-            'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '-H:+AddAllCharsets --enable-url-protocols=http,https',
+            'BP_NATIVE_IMAGE_BUILD_ARGUMENTS': '-H:+AddAllCharsets ' +
+                    '--enable-url-protocols=http,https ' +
+                    '-march=compatibility ',
     ]
     tags = ["eritpchy/webdav-aliyundriver:latest", "eritpchy/webdav-aliyundriver:${version}-${new Date().format('yyyyMMdd')}"]
 }
