@@ -31,10 +31,12 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'org.apache.commons:commons-lang3:3.8'
+    implementation 'commons-codec:commons-codec:1.15'  //java7
     compileOnly 'org.mortbay.jetty:servlet-api:3.0.20100224'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13' //api19
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13' //api19
+    implementation 'com.google.guava:guava:20.0' //java7
     implementation project(':aliyundrive-webdav-internal')
     implementation project(':aliyundrive-sdk-openapi')
     implementation project(':aliyundrive-sdk-webapi')

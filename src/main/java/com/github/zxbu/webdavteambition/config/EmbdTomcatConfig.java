@@ -1,8 +1,6 @@
 package com.github.zxbu.webdavteambition.config;
 
 import org.apache.catalina.CredentialHandler;
-import org.apache.catalina.authenticator.AuthenticatorBase;
-import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
@@ -37,6 +35,7 @@ public class EmbdTomcatConfig implements WebServerFactoryCustomizer<Configurable
         tomcatServletWebServerFactory.addContextCustomizers(context -> {
 
             RealmBase realm = new RealmBase() {
+
                 @Override
                 protected String getPassword(String username) {
                     if (mAliyunDriveProperties.getAuth().getUserName().equals(username)) {
@@ -55,16 +54,14 @@ public class EmbdTomcatConfig implements WebServerFactoryCustomizer<Configurable
             realm.setCredentialHandler(credentialHandler);
             context.setRealm(realm);
 
-            AuthenticatorBase digestAuthenticator = new BasicAuthenticator();
             SecurityConstraint securityConstraint = new SecurityConstraint();
             securityConstraint.setAuthConstraint(true);
             securityConstraint.addAuthRole("**");
             SecurityCollection collection = new SecurityCollection();
             collection.addPattern("/*");
-            collection.addOmittedMethod("OPTIONS");
             securityConstraint.addCollection(collection);
             context.addConstraint(securityConstraint);
-            context.getPipeline().addValve(digestAuthenticator);
+            context.getPipeline().addValve(new TomcatAuthenticator(mAliyunDriveProperties.getShareToken()));
 
             FilterDef corsFilterDef = new FilterDef();
             corsFilterDef.setFilterClass(CorsFilter.class.getName());
