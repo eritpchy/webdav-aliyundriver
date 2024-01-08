@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.github'
-version '4.0.0'
+version '4.0.5'
 sourceCompatibility = '17'
 
 configurations {
