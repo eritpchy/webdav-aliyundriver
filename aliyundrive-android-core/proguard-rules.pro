@@ -28,6 +28,7 @@
 }
 -keep class net.sf.webdav.WebdavServlet
 -keep class net.xdow.aliyundrive.servlet.WebdavServletInit
+-keep class net.xdow.aliyundrive.servlet.FrontendServlet
 -keep class com.github.zxbu.webdavteambition.store.AliYunDriverFileSystemStore
 -keep class org.eclipse.jetty.servlets.CrossOriginFilter
 -keep class net.xdow.aliyundrive.filter.ErrorFilter

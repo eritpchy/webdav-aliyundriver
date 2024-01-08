@@ -84,19 +84,7 @@
     </login-config>
     <servlet>
         <servlet-name>DefaultServlet</servlet-name>
-        <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
-        <init-param>
-            <param-name>resourceBase</param-name>
-            <param-value>/data/data/net.xdow.webdavaliyundriver/files/web</param-value>
-        </init-param>
-        <init-param>
-            <param-name>dirAllowed</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>pathInfoOnly</param-name>
-            <param-value>true</param-value>
-        </init-param>
+        <servlet-class>net.xdow.aliyundrive.servlet.FrontendServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>DefaultServlet</servlet-name>
