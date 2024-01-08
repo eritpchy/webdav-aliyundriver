@@ -55,9 +55,11 @@ public class DecompressUtils {
         ArchiveInputStream archiveInputStream = null;
         try {
             byte[] tarBytes = decompressXZInMemory(inputStream);
-
+            // DO NOT USE ArchiveStreamFactory.detect,
+            // low end android device 4.4.4?
+            // java.lang.VerifyError: org/apache/commons/compress/archivers/zip/ZipArchiveOutputStream
             archiveInputStream = new ArchiveStreamFactory()
-                    .createArchiveInputStream(new ByteArrayInputStream(tarBytes));
+                    .createArchiveInputStream(ArchiveStreamFactory.TAR, new ByteArrayInputStream(tarBytes));
             ArchiveEntry entry = null;
             while ((entry = archiveInputStream.getNextEntry()) != null) {
                 if (!archiveInputStream.canReadEntryData(entry)) {
