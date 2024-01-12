@@ -51,8 +51,11 @@ aliyundrive-webdav-windows-amd64.exe
 ./aliyundrive-webdav-linux-arm64
 ```
 - macOS(Intel)
+> 最新的native编译工具链目前有问题, 请先用jar版替代
+> 
+> ~~./aliyundrive-webdav-darwin-x86_64~~
 ```bash
-./aliyundrive-webdav-darwin-x86_64
+java -jar ./aliyundrive-webdav.jar
 ```
 - WebApi
 ```bash
