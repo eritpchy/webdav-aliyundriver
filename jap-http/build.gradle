@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'net.xdow'
-version '2.0.1'
+version '2.0.2'
 description 'jap-http servlet interface'
 
 java {

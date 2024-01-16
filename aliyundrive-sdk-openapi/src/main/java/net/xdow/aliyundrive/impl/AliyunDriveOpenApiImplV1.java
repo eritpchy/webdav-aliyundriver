@@ -141,7 +141,8 @@ public class AliyunDriveOpenApiImplV1 implements IAliyunDrive, AliyunDriveAuthen
             builder.removeHeader(key);
             builder.addHeader(key, value);
         }
-        return builder.build();
+        request = builder.build();
+        return request;
     }
 
     @Override
@@ -351,7 +352,7 @@ public class AliyunDriveOpenApiImplV1 implements IAliyunDrive, AliyunDriveAuthen
         return map;
     }
 
-    private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> getApiRequest(
+    public <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> getApiRequest(
             String url, Class<T> classOfT, int flags) {
         Request request = new Request.Builder()
                 .url(url)
@@ -360,12 +361,12 @@ public class AliyunDriveOpenApiImplV1 implements IAliyunDrive, AliyunDriveAuthen
         return new AliyunDriveCall<>(this.mOkHttpClient.newCall(request), classOfT);
     }
 
-    private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> postApiRequest(
+    public <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> postApiRequest(
             String url, Class<T> classOfT, int flags) {
         return postApiRequest(url, null, classOfT, flags);
     }
 
-    private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> postApiRequest(
+    public <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveCall<T> postApiRequest(
             String url, Object object, Class<T> classOfT, int flags) {
         Request.Builder builder = new Request.Builder();
         builder.url(url);

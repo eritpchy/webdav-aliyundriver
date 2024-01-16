@@ -531,12 +531,12 @@ public class AliyunDriveWebApiImplV1 implements IAliyunDrive, AliyunDriveAuthent
                 AliyunDriveWebResponse.DirectTransferGetFileInfo.class, FLAG_API_ANONYMOUS_CALL);
     }
 
-    private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveWebCall<T> postApiRequest(
+    public <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveWebCall<T> postApiRequest(
             String url, Class<? extends AliyunDriveResponse.GenericMessageInfo> classOfT, int flags) {
         return (AliyunDriveWebCall<T>) postApiRequest(url, null, classOfT, flags);
     }
 
-    private <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveWebCall<T> postApiRequest(
+    public <T extends AliyunDriveResponse.GenericMessageInfo> AliyunDriveWebCall<T> postApiRequest(
             String url, Object object, Class<T> classOfT, int flags) {
         Request.Builder builder = new Request.Builder();
         if (object instanceof AliyunDriveWebShareRequestInfo) {

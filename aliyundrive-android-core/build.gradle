@@ -15,7 +15,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 group 'net.xdow'
-version '2.0.1'
+version '2.0.2'
 description 'AliyunDrive Webdav Android Core'
 
 repositories {
