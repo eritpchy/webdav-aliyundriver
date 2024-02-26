@@ -247,14 +247,16 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
         return mUserDriveInfo;
     }
 
-    public void uploadPre(String path, long size, InputStream inputStream, @Nullable String sha1Sum, long modifyTimeSec, JapHttpResponse response) {
+    @Nullable
+    public AliyunDriveFileInfo uploadPre(String path, long size, InputStream inputStream, @Nullable String sha1Sum, long modifyTimeSec, JapHttpResponse response) {
+        AliyunDriveFileInfo resultTFile = null;
         boolean uploadSuccess = false;
         final VirtualTFileService virtualTFileService = VirtualTFileService.getInstance();
         path = normalizingPath(path);
         PathInfo pathInfo = getPathInfo(path);
         final AliyunDriveFileInfo parent = getTFileByPath(pathInfo.getParentPath());
         if (parent == null) {
-            return;
+            return null;
         }
         if (parent instanceof AliyunDriveVirtualRootFileInfo) {
             throw new ReadOnlyFolderException();
@@ -266,12 +268,12 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
             //先校验hash
             if (StringUtils.isNotEmpty(sha1Sum) && StringUtils.isNotEmpty(tfile.getContentHash())) {
                 if (String.valueOf(tfile.getContentHash()).equalsIgnoreCase(sha1Sum)) {
-                    return;
+                    return tfile;
                 }
             } else {
                 //如果文件大小一样，则不再上传
                 if (size > 0 && tfile.getSize() == size) {
-                    return;
+                    return tfile;
                 }
             }
             removeByPath(path);
@@ -302,7 +304,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
                             int read = IOUtils.read(inputStream, buffer, 0, buffer.length);
                             if (read == -1) {
                                 LOGGER.info("文件上传结束。文件名：{}，当前进度：{}/{}", path, (i + 1), partInfoList.size());
-                                return;
+                                return null;
                             } else if (read == 0) {
                                 continue;
                             }
@@ -323,6 +325,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
                     AliyunDriveFileInfo vTFile = virtualTFileService.get(parentInfo, fileId);
                     vTFile.setContentHash(null);
                     vTFile.setSize(0L);
+                    resultTFile = vTFile;
                     LOGGER.info("文件上传成功。文件名：{} 文件大小: {} 已上传: {} 虚拟文件: {}", path, size, totalUploadedSize, vTFile);
                 } if (totalUploadedSize == size) {
                     AliyunDriveResponse.FileUploadCompleteInfo fileUploadCompleteInfo = uploadComplete(fileInfo, uploadId, sha1Sum);
@@ -331,6 +334,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
                     vTFile.setContentHash(fileUploadCompleteInfo.getContentHash());
                     vTFile.setSize(fileUploadCompleteInfo.getSize());
                     vTFile.setThumbnail(fileUploadCompleteInfo.getThumbnail());
+                    resultTFile = vTFile;
                     LOGGER.info("文件上传成功。文件名：{} 文件大小: {} 已上传: {} 虚拟文件: {}", path, size, totalUploadedSize, vTFile);
                 } else {
                     LOGGER.info("文件上传失败。文件名：{} 文件大小: {} 已上传: {}", path, size, totalUploadedSize);
@@ -352,6 +356,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
         } finally {
             clearCacheAsync(parentInfo);
         }
+        return resultTFile;
     }
 
     private AliyunDriveResponse.FileUploadCompleteInfo uploadComplete(AFileReqInfo info, String uploadId, @Nullable String sha1Sum) {

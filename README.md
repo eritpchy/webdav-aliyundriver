@@ -171,18 +171,18 @@ implementation "com.squareup.okhttp3:logging-interceptor:3.12.13" //api19
 implementation "com.google.code.gson:gson:2.8.9"
 
 //主要
-implementation "net.xdow:aliyundrive-sdk-openapi:2.0.2"
-implementation "net.xdow:aliyundrive-sdk-webapi:2.0.2"
+implementation "net.xdow:aliyundrive-sdk-openapi:2.0.3"
+implementation "net.xdow:aliyundrive-sdk-webapi:2.0.3"
 
 //可选
-implementation "net.xdow:webdav:2.0.2"
-implementation "net.xdow:webdav-jakarta:2.0.2"
-implementation "net.xdow:webdav-javax:2.0.2"
-implementation "net.xdow:aliyundrive-webdav-internal:2.0.2"
-implementation "net.xdow:aliyundrive-android-core:2.0.2"
-implementation "net.xdow:jap-http:2.0.2"
-implementation "net.xdow:jap-http-jakarta-adapter:2.0.2"
-implementation "net.xdow:jap-http-javax-adapter:2.0.2"
+implementation "net.xdow:webdav:2.0.3"
+implementation "net.xdow:webdav-jakarta:2.0.3"
+implementation "net.xdow:webdav-javax:2.0.3"
+implementation "net.xdow:aliyundrive-webdav-internal:2.0.3"
+implementation "net.xdow:aliyundrive-android-core:2.0.3"
+implementation "net.xdow:jap-http:2.0.3"
+implementation "net.xdow:jap-http-jakarta-adapter:2.0.3"
+implementation "net.xdow:jap-http-javax-adapter:2.0.3"
 ```
 ## SDK基础用法
 ```java
