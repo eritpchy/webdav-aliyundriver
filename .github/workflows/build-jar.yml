@@ -63,15 +63,17 @@ jobs:
         run: ./gradlew --no-daemon :bootJar
       -
         name: Upload artifacts
-        uses: Wandalen/wretry.action@v1.0.36
+        uses: Wandalen/wretry.action@master
         with:
-          action: bxb100/action-upload-webdav@v1
+          action: bxb100/action-upload@main
           with: |
-            webdav_address: ${{secrets.WEBDAV_ADDRESS}}
-            webdav_username: ${{secrets.WEBDAV_USERNAME}}
-            webdav_password: ${{secrets.WEBDAV_PASSWORD}}
-            webdav_upload_path: "/${{ env.VERSION_INFORMATION }}"
-            files: |
-              build/libs/aliyundrive-webdav-${{ env.VERSION_INFORMATION }}.jar
+            provider: webdav
+            provider_options: |
+              endpoint=${{secrets.WEBDAV_ADDRESS}}
+              username=${{secrets.WEBDAV_USERNAME}}
+              password=${{secrets.WEBDAV_PASSWORD}}
+              root=/${{ env.VERSION_INFORMATION }}/
+            include: |
+              build/libs/aliyundrive-webdav-*.jar
           attempt_limit: 3
           attempt_delay: 0

@@ -68,15 +68,17 @@ jobs:
           path: "./aliyundrive-webdav-${{matrix.target.suffix}}-${{matrix.target.arch}}.exe"
       -
         name: Upload artifacts
-        uses: Wandalen/wretry.action@v1.0.36
+        uses: Wandalen/wretry.action@master
         with:
-          action: bxb100/action-upload-webdav@v1
+          action: bxb100/action-upload@main
           with: |
-            webdav_address: ${{secrets.WEBDAV_ADDRESS}}
-            webdav_username: ${{secrets.WEBDAV_USERNAME}}
-            webdav_password: ${{secrets.WEBDAV_PASSWORD}}
-            webdav_upload_path: "/${{ env.VERSION_INFORMATION }}"
-            files: |
-              build/native/nativeCompile/aliyundrive-webdav-${{matrix.target.suffix}}-${{matrix.target.arch}}.exe.zip
+            provider: webdav
+            provider_options: |
+              endpoint=${{secrets.WEBDAV_ADDRESS}}
+              username=${{secrets.WEBDAV_USERNAME}}
+              password=${{secrets.WEBDAV_PASSWORD}}
+              root=/${{ env.VERSION_INFORMATION }}/
+            include: |
+              build/native/nativeCompile/aliyundrive-webdav-${{matrix.target.suffix}}-*.exe.zip
           attempt_limit: 3
           attempt_delay: 0
