@@ -8,7 +8,6 @@ import com.github.zxbu.webdavteambition.config.AliyunDriveProperties;
 import com.github.zxbu.webdavteambition.handler.GetRequestHandlerHolder;
 import com.github.zxbu.webdavteambition.handler.IGetRequestHandler;
 import com.google.common.net.HttpHeaders;
-import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import lombok.Getter;
 import net.sf.webdav.ITransaction;
@@ -18,6 +17,7 @@ import net.sf.webdav.Transaction;
 import net.sf.webdav.exceptions.WebdavException;
 import net.sf.webdav.util.ClientIdentifyUtils;
 import net.sf.webdav.util.DateTimeUtils;
+import net.sf.webdav.util.EscaperUtils;
 import net.xdow.aliyundrive.bean.AliyunDriveEnum;
 import net.xdow.aliyundrive.bean.AliyunDriveFileInfo;
 import net.xdow.aliyundrive.exception.NotAuthenticatedException;
@@ -371,7 +371,7 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
 
     @Override
     public String getPublicLink(ITransaction transaction, String path) {
-        path = UrlEscapers.urlFragmentEscaper().escape(path);
+        path = EscaperUtils.escapePath(path);
         AliyunDriveProperties properties = this.aliyunDriveClientService.getProperties();
         String shareToken = properties.getShareToken();
         long shareExpireSec = properties.getShareExpireSec();

@@ -33,7 +33,8 @@ jobs:
     strategy:
       matrix:
         target:
-          - { os: macos-12, arch: x86_64, suffix: darwin }
+          - { os: macos-13, arch: x86_64, suffix: darwin }
+          - { os: macos-14, arch: arm64, suffix: darwin }
           - { os: self-hosted, arch: arm64, suffix: linux }
           - { os: ubuntu-22.04, arch: amd64, suffix: linux }
     steps:

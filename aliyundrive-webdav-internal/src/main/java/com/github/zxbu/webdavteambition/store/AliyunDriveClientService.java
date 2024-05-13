@@ -49,8 +49,6 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
     private AliyunDriveResponse.UserDriveInfo mUserDriveInfo;
 
     private AliyunDriveProperties mAliyunDriveProperties;
-    // / 字符占位符
-    private static String FILE_PATH_PLACE_HOLDER = "[@-@]";
     private ScheduledExecutorService mTaskPool = Executors.newScheduledThreadPool(1);
     private Runnable mOnAccountChangedListener;
 
@@ -155,8 +153,15 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
         Set<AliyunDriveFileInfo> tFileSets = new LinkedHashSet<>();
         for (AliyunDriveFileInfo tFile : tFileList) {
             String fileName = tFile.getName();
-            if (StringUtils.isNotEmpty(fileName) && fileName.contains("/")) {
-                tFile.setName(fileName.replace("/", FILE_PATH_PLACE_HOLDER));
+            if (StringUtils.isNotEmpty(fileName)) {
+                tFile.setName(fileName.replace("?", "？")
+                        .replace("<", "＜")
+                        .replace(">", "＞")
+                        .replace("'", "＇")
+                        .replace("\"", "＂")
+                        .replace(":", "：")
+                        .replace("*", "＊")
+                        .replace("/", "／"));
             }
             if (!tFileSets.add(tFile)) {
                 LOGGER.info("当前目录 driveId: {} fileId:{} 存在同名文件：{}，文件大小：{}",

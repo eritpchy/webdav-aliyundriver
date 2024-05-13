@@ -74,7 +74,6 @@ public abstract class AbstractMethod implements IMethodExecutor {
         URL_ENCODER.addSafeCharacter('-');
         URL_ENCODER.addSafeCharacter('_');
         URL_ENCODER.addSafeCharacter('.');
-        URL_ENCODER.addSafeCharacter('*');
         URL_ENCODER.addSafeCharacter('/');
         CREATION_DATE_FORMAT_GMT_SDF.setTimeZone(TimeZone.getTimeZone("GMT"));
         LAST_MODIFIED_DATE_FORMAT_GMT_SDF.setTimeZone(TimeZone.getTimeZone("GMT"));

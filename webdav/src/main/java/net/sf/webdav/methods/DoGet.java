@@ -17,7 +17,6 @@ package net.sf.webdav.methods;
 
 import com.fujieid.jap.http.JapHttpRequest;
 import com.fujieid.jap.http.JapHttpResponse;
-import com.google.common.net.UrlEscapers;
 import net.sf.webdav.*;
 import net.sf.webdav.locking.ResourceLocks;
 import org.apache.commons.io.IOUtils;
@@ -180,7 +179,7 @@ public class DoGet extends DoHead {
                         childrenTemp.append("./");
                     }
 
-                    childrenTemp.append(UrlEscapers.urlFragmentEscaper().escape(child));
+                    childrenTemp.append(URL_ENCODER.encode(child));
                     String childPath = new File(path, child).getPath();
                     StoredObject obj = _store.getStoredObject(transaction, childPath);
                     if (obj == null) {

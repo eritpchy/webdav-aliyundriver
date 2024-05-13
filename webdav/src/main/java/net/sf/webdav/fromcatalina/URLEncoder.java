@@ -54,7 +54,7 @@ public class URLEncoder
         for (char i = '0'; i <= '9'; i++) {
             addSafeCharacter(i);
         }
-        for(char c : "$-_.+!*'(),".toCharArray()){
+        for(char c : "$-_.+!'(),".toCharArray()){
              addSafeCharacter(c);
         }
     }

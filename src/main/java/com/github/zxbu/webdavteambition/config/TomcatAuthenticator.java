@@ -1,10 +1,10 @@
 package com.github.zxbu.webdavteambition.config;
 
-import com.google.common.net.UrlEscapers;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.webdav.util.EscaperUtils;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -96,7 +96,7 @@ public class TomcatAuthenticator extends BasicAuthenticator {
 
         String shareToken = mShareToken;
         if (publicLinkHash.equals(DigestUtils.sha1Hex(path + "_" + shareToken + "_" + expireSec))
-                || publicLinkHash.equals(DigestUtils.sha1Hex(UrlEscapers.urlFragmentEscaper().escape(path) + "_" + shareToken + "_" + expireSec))) {
+                || publicLinkHash.equals(DigestUtils.sha1Hex(EscaperUtils.escapePath(path) + "_" + shareToken + "_" + expireSec))) {
             setRequestAsAnonymous(req);
             return true; // 允许匿名访问
         }
