@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'net.xdow'
-version '2.0.4'
+version '2.0.5'
 description 'AliyunDrive Webdav jakarta implement'
 
 java {

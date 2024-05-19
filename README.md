@@ -171,18 +171,18 @@ implementation "com.squareup.okhttp3:logging-interceptor:3.12.13" //api19
 implementation "com.google.code.gson:gson:2.8.9"
 
 //主要
-implementation "net.xdow:aliyundrive-sdk-openapi:2.0.4"
-implementation "net.xdow:aliyundrive-sdk-webapi:2.0.4"
+implementation "net.xdow:aliyundrive-sdk-openapi:2.0.5"
+implementation "net.xdow:aliyundrive-sdk-webapi:2.0.5"
 
 //可选
-implementation "net.xdow:webdav:2.0.4"
-implementation "net.xdow:webdav-jakarta:2.0.4"
-implementation "net.xdow:webdav-javax:2.0.4"
-implementation "net.xdow:aliyundrive-webdav-internal:2.0.4"
-implementation "net.xdow:aliyundrive-android-core:2.0.4"
-implementation "net.xdow:jap-http:2.0.4"
-implementation "net.xdow:jap-http-jakarta-adapter:2.0.4"
-implementation "net.xdow:jap-http-javax-adapter:2.0.4"
+implementation "net.xdow:webdav:2.0.5"
+implementation "net.xdow:webdav-jakarta:2.0.5"
+implementation "net.xdow:webdav-javax:2.0.5"
+implementation "net.xdow:aliyundrive-webdav-internal:2.0.5"
+implementation "net.xdow:aliyundrive-android-core:2.0.5"
+implementation "net.xdow:jap-http:2.0.5"
+implementation "net.xdow:jap-http-jakarta-adapter:2.0.5"
+implementation "net.xdow:jap-http-javax-adapter:2.0.5"
 ```
 ## SDK基础用法
 ```java
@@ -214,6 +214,7 @@ AliyunDrive.newAliyunDrive()
 | MXPlayer      |     :rocket:直连模式 | :white_check_mark: |                                                         |
 | jetAudio      |     :rocket:直连模式 | :white_check_mark: | 受jetAudio限制,端口号只能为80(http) 或 443(https),<br/>安卓端不可直接监听以上端口! |
 | VLC           | ~~:rocket:直连模式~~ | :white_check_mark: |                                                         |
+| Zotero        |     :rocket:直连模式 | :white_check_mark: |                                                         |
 
 - 所有客户端均默认支持代理模式
 - ~~:rocket:直连模式~~: 由于阿里云盘目前直链有效期为15分钟, 部分播放器遇阿里云盘链接失效不会主动回webdav请求, 常见表现为播放停止, 无法拖动进度条, 中途直接切换下一集等等, 以上有标注的播放器均默认禁用直连模式, 普通连续下载文件不受影响

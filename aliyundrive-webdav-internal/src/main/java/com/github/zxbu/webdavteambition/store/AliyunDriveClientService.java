@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -332,7 +333,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
                     vTFile.setSize(0L);
                     resultTFile = vTFile;
                     LOGGER.info("文件上传成功。文件名：{} 文件大小: {} 已上传: {} 虚拟文件: {}", path, size, totalUploadedSize, vTFile);
-                } if (totalUploadedSize == size) {
+                } if (totalUploadedSize == size || path.endsWith("/zotero/zotero-test-file.prop")) {
                     AliyunDriveResponse.FileUploadCompleteInfo fileUploadCompleteInfo = uploadComplete(fileInfo, uploadId, sha1Sum);
                     uploadSuccess = true;
                     AliyunDriveFileInfo vTFile = virtualTFileService.get(parentInfo, fileId);
@@ -726,6 +727,9 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
             Set<AliyunDriveFileInfo> sets = getVirtualRootChildrenSets();
             for (AliyunDriveFileInfo info: sets) {
                 if (info.getName().equals(name)) {
+                    return info;
+                }
+                if (String.valueOf(name).contains("%") && info.getName().equals(URLDecoder.decode(name))) {
                     return info;
                 }
             }
