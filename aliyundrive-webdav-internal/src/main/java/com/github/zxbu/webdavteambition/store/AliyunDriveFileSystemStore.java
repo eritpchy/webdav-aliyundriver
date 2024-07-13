@@ -396,6 +396,9 @@ public class AliyunDriveFileSystemStore implements IWebdavStore {
                 return true;
             }
         } catch (IOException e) {
+            if (e.getClass().toString().endsWith(".ClientAbortException")) {
+                return true;
+            }
             throw new WebdavException(e);
         }
         return false;

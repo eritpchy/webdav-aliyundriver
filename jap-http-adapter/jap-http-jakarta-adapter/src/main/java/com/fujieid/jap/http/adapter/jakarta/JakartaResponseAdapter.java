@@ -147,6 +147,9 @@ public class JakartaResponseAdapter implements JapHttpResponse {
                 this.response.getWriter().write(html);
             }
         } catch (IOException e) {
+            if (e.getClass().toString().endsWith(".ClientAbortException")) {
+                return;
+            }
             e.printStackTrace();
         }
     }
