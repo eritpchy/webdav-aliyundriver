@@ -10,6 +10,8 @@ public class AliyunDriveConstant {
     public static final String API_QRCODE_GENERATE = API_HOST + "/oauth/authorize/qrcode";
     public static final String API_QRCODE_IMAGE = API_HOST + "/oauth/qrcode/%s";
     public static final String API_QRCODE_QUERY_STATUS = API_HOST + "/oauth/qrcode/%s/status";
+    public static final String API_QRCODE_AUTHORIZE = REFERER + "o/oauth/authorize?sid=%s";
+
     public static final String API_USER_INFO = API_HOST + "/oauth/users/info";
     public static final String API_USER_GET_SPACE_INFO = API_HOST + "/adrive/v1.0/user/getSpaceInfo";
     public static final String API_USER_GET_DRIVE_INFO = API_HOST + "/adrive/v1.0/user/getDriveInfo";

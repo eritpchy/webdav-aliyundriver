@@ -805,7 +805,7 @@ public class AliyunDriveClientService<T extends IAliyunDrive> implements IAliyun
         tFileListCache.invalidateAll();
     }
 
-    private boolean login(String refreshToken) {
+    public boolean login(String refreshToken) {
         if (StringUtils.isEmpty(refreshToken)) {
             return false;
         }

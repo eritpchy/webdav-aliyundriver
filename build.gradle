@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.github'
-version '4.0.6'
+version '4.1.0'
 sourceCompatibility = '17'
 
 configurations {
@@ -37,6 +37,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.13' //api19
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13' //api19
     implementation 'com.google.guava:guava:20.0' //java7
+    implementation 'com.github.auties00:qr-terminal:2.1'
+    implementation 'com.google.zxing:core:3.5.3'
     implementation project(':aliyundrive-webdav-internal')
     implementation project(':aliyundrive-sdk-openapi')
     implementation project(':aliyundrive-sdk-webapi')

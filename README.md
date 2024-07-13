@@ -40,20 +40,15 @@
 
 - Windows
 ```powershell
+chcp 65001
 aliyundrive-webdav-windows-amd64.exe
 ```
-- Linux(X64)
+- Linux
 ```bash
-./aliyundrive-webdav-linux-amd64
+./aliyundrive-webdav-linux-*
 ```
-- Linux(ARM64)
-```bash
-./aliyundrive-webdav-linux-arm64
-```
-- macOS(Intel)
-> 最新的native编译工具链目前有问题, 请先用jar版替代
-> 
-> ~~./aliyundrive-webdav-darwin-x86_64~~
+- macOS
+> ./aliyundrive-webdav-darwin-*
 ```bash
 java -jar ./aliyundrive-webdav.jar
 ```

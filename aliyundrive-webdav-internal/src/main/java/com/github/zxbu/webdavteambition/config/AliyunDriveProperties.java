@@ -35,6 +35,7 @@ public class AliyunDriveProperties {
     private transient String authorizationCode;
     private transient String aliyunAccessTokenUrl = "https://adrive.xdow.net/oauth/access_token?code=%s&refresh_token=%s&ver=2.0.0";
     private transient String aliyunAuthorizeUrl = "https://adrive.xdow.net/oauth/authorize?redirect_uri=%s";
+    private transient String aliyunQrGenerateUrl = "https://adrive.xdow.net/oauth/authorize/qrcode";
 
     private transient Auth auth = new Auth();
     private transient Driver driver = Driver.OpenApi;

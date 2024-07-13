@@ -80,6 +80,8 @@ import java.util.Map;
         AliyunDriveResponse.FileMoveToTrashInfo.class,
         AliyunDriveResponse.FileDeleteInfo.class,
         AliyunDriveResponse.GenericMessageInfo.class,
+        AliyunDriveResponse.QrCodeGenerateInfo.class,
+        AliyunDriveResponse.QrCodeQueryStatusInfo.class,
         AliyunDriveUploadedPartInfo.class,
         AliyunDriveMediaMetaData.class,
         AliyunDriveWebResponse.ShareTokenInfo.class,
